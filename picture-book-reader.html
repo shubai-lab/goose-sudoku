@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>绘本阅读器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #1a1a2e;
+        }
+
+        /* 绘本容器 */
+        .book-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        /* 页面容器 */
+        .pages-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            will-change: transform;
+        }
+
+        /* 单页 */
+        .page {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: #fafafa;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 图片容器 */
+        .image-container {
+            width: 100%;
+            height: calc(100% - 100px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .page-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .page-image.loaded {
+            opacity: 1;
+        }
+
+        /* 加载状态 */
+        .loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #4a90d9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 错误状态 */
+        .error-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: none;
+        }
+
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .error-text {
+            color: #e74c3c;
+            font-size: 16px;
+        }
+
+        /* 文字说明 */
+        .page-text {
+            height: 100px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            background: #fff;
+            border-top: 1px solid #eee;
+        }
+
+        .page-text p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            text-align: center;
+            max-width: 800px;
+        }
+
+        /* 点击区域 */
+        .click-area {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 33.33%;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .click-area:hover {
+            opacity: 1;
+            background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+        }
+
+        .click-area.prev {
+            left: 0;
+        }
+
+        .click-area.next {
+            right: 0;
+        }
+
+        .click-area.next:hover {
+            background: linear-gradient(to left, rgba(0,0,0,0.1), transparent);
+        }
+
+        .click-area.disabled {
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        /* 页码指示器 */
+        .page-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 200;
+            transition: opacity 0.3s;
+        }
+
+        .page-indicators.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid #fff;
+        }
+
+        .indicator:hover {
+            transform: scale(1.2);
+        }
+
+        .indicator.active {
+            background: #fff;
+            transform: scale(1.2);
+        }
+
+        /* 全屏按钮 */
+        .fullscreen-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .fullscreen-btn:hover {
+            background: #fff;
+            transform: scale(1.05);
+        }
+
+        .fullscreen-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: #333;
+        }
+
+        /* 页码显示 */
+        .page-number {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            z-index: 200;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* 触摸反馈 */
+        .touch-feedback {
+            position: absolute;
+            top: 0;
+            width: 60px;
+            height: 100%;
+            z-index: 150;
+            display: none;
+        }
+
+        .touch-feedback.left {
+            left: 0;
+            background: linear-gradient(to right, rgba(74, 144, 217, 0.3), transparent);
+        }
+
+        .touch-feedback.right {
+            right: 0;
+            background: linear-gradient(to left, rgba(74, 144, 217, 0.3), transparent);
+        }
+
+        .touch-feedback.active {
+            display: block;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .page-text p {
+                font-size: 15px;
+            }
+
+            .page-number {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .fullscreen-btn {
+                width: 40px;
+                height: 40px;
+                top: 10px;
+                right: 10px;
+            }
+
+            .page-indicators {
+                bottom: 15px;
+                gap: 8px;
+            }
+
+            .indicator {
+                width: 8px;
+                height: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-text p {
+                font-size: 14px;
+            }
+
+            .page-text {
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="book-container" id="bookContainer">
+        <!-- 全屏按钮 -->
+        <button class="fullscreen-btn" id="fullscreenBtn" title="全屏 (F)">
+            <svg viewBox="0 0 24 24" id="fullscreenIcon">
+                <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h3v-2h-5v3h2v-5zM5 5h2V3H5v2zm4 14h2v-3H5v5h5v-2z"/>
+            </svg>
+        </button>
+
+        <!-- 页码显示 -->
+        <div class="page-number" id="pageNumber">1 / 5</div>
+
+        <!-- 页面容器 -->
+        <div class="pages-wrapper" id="pagesWrapper">
+            <!-- 页面将由JS动态生成 -->
+        </div>
+
+        <!-- 页码指示器 -->
+        <div class="page-indicators" id="pageIndicators">
+            <!-- 圆点将由JS动态生成 -->
+        </div>
+
+        <!-- 触摸反馈 -->
+        <div class="touch-feedback left" id="touchFeedbackLeft"></div>
+        <div class="touch-feedback right" id="touchFeedbackRight"></div>
+    </div>
+
+    <script>
+        /* ==========================================
+           绘本配置 - 在此添加你的图片和文字
+           ========================================== */
+        const BOOK_PAGES = [
+            // 在这里添加你的页面配置
+            // 格式: { image: '图片路径', text: '文字说明' }
+            // 示例:
+            // { image: 'images/page1.jpg', text: '第一页的故事内容' },
+            // { image: 'images/page2.jpg', text: '第二页的故事内容' },
+
+            // 示例页面 - 请替换为你的图片
+            {
+                image: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect fill="#4a90d9" width="600" height="400"/><text x="300" y="200" font-family="Arial" font-size="32" fill="white" text-anchor="middle">第一页</text><text x="300" y="250" font-family="Arial" font-size="18" fill="white" text-anchor="middle">请替换为你的图片</text></svg>'),
+                text: '这是第一页。你可以在这里写上故事的开头。'
+            },
+            {
+                image: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect fill="#27ae60" width="600" height="400"/><text x="300" y="200" font-family="Arial" font-size="32" fill="white" text-anchor="middle">第二页</text><text x="300" y="250" font-family="Arial" font-size="18" fill="white" text-anchor="middle">继续添加更多页面</text></svg>'),
+                text: '这是第二页。故事继续发展...'
+            },
+            {
+                image: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect fill="#e74c3c" width="600" height="400"/><text x="300" y="200" font-family="Arial" font-size="32" fill="white" text-anchor="middle">第三页</text><text x="300" y="250" font-family="Arial" font-size="18" fill="white" text-anchor="middle">更多精彩内容</text></svg>'),
+                text: '这是第三页。故事越来越精彩！'
+            },
+            {
+                image: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect fill="#f39c12" width="600" height="400"/><text x="300" y="200" font-family="Arial" font-size="32" fill="white" text-anchor="middle">第四页</text><text x="300" y="250" font-family="Arial" font-size="18" fill="white" text-anchor="middle">接近尾声</text></svg>'),
+                text: '这是第四页。故事快要结束了。'
+            },
+            {
+                image: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect fill="#9b59b6" width="600" height="400"/><text x="300" y="200" font-family="Arial" font-size="32" fill="white" text-anchor="middle">第五页</text><text x="300" y="250" font-family="Arial" font-size="18" fill="white" text-anchor="middle">美好的结局</text></svg>'),
+                text: '这是第五页（最后一页）。故事圆满结束！'
+            }
+        ];
+
+        /* ==========================================
+           代码实现
+           ========================================== */
+
+        class PictureBookReader {
+            constructor(pages) {
+                this.pagesList = pages;
+                this.currentPage = 0;
+                this.isAnimating = false;
+                this.touchStartX = 0;
+                this.touchStartY = 0;
+                this.touchDeltaX = 0;
+
+                this.initElements();
+                this.renderPages();
+                this.renderIndicators();
+                this.bindEvents();
+                this.preloadAdjacentImages();
+            }
+
+            initElements() {
+                this.bookContainer = document.getElementById('bookContainer');
+                this.pagesWrapper = document.getElementById('pagesWrapper');
+                this.pageIndicators = document.getElementById('pageIndicators');
+                this.pageNumber = document.getElementById('pageNumber');
+                this.fullscreenBtn = document.getElementById('fullscreenBtn');
+                this.fullscreenIcon = document.getElementById('fullscreenIcon');
+                this.touchFeedbackLeft = document.getElementById('touchFeedbackLeft');
+                this.touchFeedbackRight = document.getElementById('touchFeedbackRight');
+            }
+
+            renderPages() {
+                this.pagesWrapper.innerHTML = '';
+
+                this.pageList.forEach((page, index) => {
+                    const pageEl = document.createElement('div');
+                    pageEl.className = 'page';
+                    pageEl.innerHTML = `
+                        <div class="image-container">
+                            <div class="loading-indicator">
+                                <div class="loading-spinner"></div>
+                                <div class="loading-text">加载中...</div>
+                            </div>
+                            <div class="error-indicator">
+                                <div class="error-icon">📷</div>
+                                <div class="error-text">图片加载失败</div>
+                            </div>
+                            <img class="page-image" data-index="${index}" alt="第${index + 1}页" />
+                        </div>
+                        <div class="page-text">
+                            <p>${page.text || ''}</p>
+                        </div>
+                    `;
+                    this.pagesWrapper.appendChild(pageEl);
+
+                    // 加载图片
+                    const img = pageEl.querySelector('.page-image');
+                    const loading = pageEl.querySelector('.loading-indicator');
+                    const error = pageEl.querySelector('.error-indicator');
+
+                    img.onload = () => {
+                        img.classList.add('loaded');
+                        loading.style.display = 'none';
+                    };
+
+                    img.onerror = () => {
+                        loading.style.display = 'none';
+                        error.style.display = 'block';
+                    };
+
+                    img.src = page.image;
+                });
+
+                this.updatePagePosition();
+            }
+
+            renderIndicators() {
+                this.pageIndicators.innerHTML = '';
+
+                this.pageList.forEach((_, index) => {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'indicator' + (index === 0 ? ' active' : '');
+                    indicator.addEventListener('click', () => this.goToPage(index));
+                    this.pageIndicators.appendChild(indicator);
+                });
+
+                this.updatePageNumber();
+            }
+
+            updatePagePosition() {
+                const offset = -this.currentPage * 100;
+                this.pagesWrapper.style.transform = `translateX(${offset}%)`;
+                this.updateIndicators();
+                this.updatePageNumber();
+                this.preloadAdjacentImages();
+            }
+
+            updateIndicators() {
+                const indicators = this.pageIndicators.querySelectorAll('.indicator');
+                indicators.forEach((ind, index) => {
+                    ind.classList.toggle('active', index === this.currentPage);
+                });
+            }
+
+            updatePageNumber() {
+                this.pageNumber.textContent = `${this.currentPage + 1} / ${this.pageList.length}`;
+            }
+
+            goToPage(index) {
+                if (this.isAnimating || index === this.currentPage) return;
+                if (index < 0 || index >= this.pageList.length) return;
+
+                this.isAnimating = true;
+                this.currentPage = index;
+                this.updatePagePosition();
+
+                setTimeout(() => {
+                    this.isAnimating = false;
+                }, 350);
+            }
+
+            nextPage() {
+                if (this.currentPage < this.pageList.length - 1) {
+                    this.goToPage(this.currentPage + 1);
+                }
+            }
+
+            prevPage() {
+                if (this.currentPage > 0) {
+                    this.goToPage(this.currentPage - 1);
+                }
+            }
+
+            bindEvents() {
+                // 点击翻页
+                this.bookContainer.addEventListener('click', (e) => {
+                    if (e.target.closest('.fullscreen-btn') ||
+                        e.target.closest('.page-indicators') ||
+                        e.target.closest('.indicator')) {
+                        return;
+                    }
+
+                    const rect = this.bookContainer.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const width = rect.width;
+
+                    if (x < width * 0.33) {
+                        this.prevPage();
+                    } else if (x > width * 0.66) {
+                        this.nextPage();
+                    }
+                });
+
+                // 键盘控制
+                document.addEventListener('keydown', (e) => {
+                    switch (e.key) {
+                        case 'ArrowLeft':
+                            this.prevPage();
+                            break;
+                        case 'ArrowRight':
+                            this.nextPage();
+                            break;
+                        case 'f':
+                        case 'F':
+                            this.toggleFullscreen();
+                            break;
+                        case 'Escape':
+                            this.exitFullscreen();
+                            break;
+                    }
+                });
+
+                // 触摸滑动
+                this.bookContainer.addEventListener('touchstart', (e) => {
+                    this.touchStartX = e.touches[0].clientX;
+                    this.touchStartY = e.touches[0].clientY;
+                }, { passive: true });
+
+                this.bookContainer.addEventListener('touchend', (e) => {
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const touchEndY = e.changedTouches[0].clientY;
+
+                    const deltaX = touchEndX - this.touchStartX;
+                    const deltaY = touchEndY - this.touchStartY;
+
+                    // 水平滑动超过垂直滑动，且距离足够
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                        if (deltaX > 0) {
+                            // 向右滑动 - 上一页
+                            this.prevPage();
+                        } else {
+                            // 向左滑动 - 下一页
+                            this.nextPage();
+                        }
+                    }
+                }, { passive: true });
+
+                // 触摸反馈
+                this.bookContainer.addEventListener('touchstart', (e) => {
+                    const x = e.touches[0].clientX;
+                    const rect = this.bookContainer.getBoundingClientRect();
+                    const relX = x - rect.left;
+                    const width = rect.width;
+
+                    if (relX < width * 0.33) {
+                        this.touchFeedbackLeft.classList.add('active');
+                    } else if (relX > width * 0.66) {
+                        this.touchFeedbackRight.classList.add('active');
+                    }
+                }, { passive: true });
+
+                this.bookContainer.addEventListener('touchend', () => {
+                    this.touchFeedbackLeft.classList.remove('active');
+                    this.touchFeedbackRight.classList.remove('active');
+                });
+
+                // 全屏按钮
+                this.fullscreenBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleFullscreen();
+                });
+
+                // 全屏变化
+                document.addEventListener('fullscreenchange', () => {
+                    this.updateFullscreenButton();
+                });
+
+                // 窗口大小变化
+                window.addEventListener('resize', () => {
+                    this.handleResize();
+                });
+            }
+
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    this.bookContainer.requestFullscreen().catch(err => {
+                        console.log('全屏失败:', err);
+                    });
+                } else {
+                    this.exitFullscreen();
+                }
+            }
+
+            exitFullscreen() {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                }
+            }
+
+            updateFullscreenButton() {
+                if (document.fullscreenElement) {
+                    this.fullscreenIcon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+                    this.pageIndicators.classList.add('hidden');
+                } else {
+                    this.fullscreenIcon.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h3v-2h-5v3h2v-5zM5 5h2V3H5v2zm4 14h2v-3H5v5h5v-2z"/>';
+                    this.pageIndicators.classList.remove('hidden');
+                }
+            }
+
+            preloadAdjacentImages() {
+                const indices = [this.currentPage - 1, this.currentPage + 1];
+                indices.forEach(idx => {
+                    if (idx >= 0 && idx < this.pageList.length) {
+                        const img = this.pagesWrapper.querySelector(`.page-image[data-index="${idx}"]`);
+                        if (img && !img.src) {
+                            img.src = this.pageList[idx].image;
+                        }
+                    }
+                });
+            }
+
+            handleResize() {
+                // 可以在这里添加横竖屏切换处理
+            }
+        }
+
+        // 初始化阅读器
+        document.addEventListener('DOMContentLoaded', () => {
+            if (BOOK_PAGES.length === 0) {
+                alert('请先在代码中配置绘本页面！');
+                return;
+            }
+            new PictureBookReader(BOOK_PAGES);
+        });
+    </script>
+</body>
+</html>
