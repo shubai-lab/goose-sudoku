@@ -399,11 +399,11 @@
         function generateSudoku(difficulty) {
             const config = DIFFICULTY_CONFIG[difficulty];
             const rows = config.rows;
-            const cols = config.cols;
+            const cols = config.colss;
             const boxR = config.boxRows;
             const boxC = config.boxCols;
-            const board = new Array(rows * col).fill(0);
-            solveSudoku(board, rows, col, boxR, boxC);
+            const board = new Array(rows * cols).fill(0);
+            solveSudoku(board, rows, cols, boxR, boxC);
             return board;
         }
 
@@ -430,7 +430,7 @@
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
             const config = DIFFICULTY_CONFIG[currentDifficulty];
-            const cols = config.col;
+            const cols = config.cols;
             const rows = config.rows;
             const useAnimal = config.useAnimal;
             const total = row * col;
@@ -521,7 +521,7 @@
         function checkCompletion() {
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const row = config.rows;
-            const col = config.col;
+            const col = config.cols;
             const total = row * col;
             for (let i = 0; i < total; i++) {
                 if (puzzle[i] !== solution[i]) return;
@@ -552,7 +552,7 @@
 
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const row = config.rows;
-            const col = config.col;
+            const col = config.cols;
             const total = row * col;
 
             const removeCount = getRemoveCount(currentDifficulty, currentLevel);
