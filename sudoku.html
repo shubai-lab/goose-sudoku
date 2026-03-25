@@ -522,7 +522,7 @@
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const row = config.rows;
             const col = config.cols;
-            const total = rows * cols;
+            const total = row * col;
             for (let i = 0; i < total; i++) {
                 if (puzzle[i] !== solution[i]) return;
             }
@@ -553,7 +553,7 @@
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const row = config.rows;
             const col = config.cols;
-            const total = rows * cols;
+            const total = row * col;
 
             const removeCount = getRemoveCount(currentDifficulty, currentLevel);
             solution = generateSudoku(currentDifficulty);
