@@ -399,7 +399,7 @@
         function generateSudoku(difficulty) {
             const config = DIFFICULTY_CONFIG[difficulty];
             const rows = config.rows;
-            const cols = config.colss;
+            const col = config.cols;
             const boxR = config.boxRows;
             const boxC = config.boxCols;
             const board = new Array(rows * cols).fill(0);
