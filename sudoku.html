@@ -33,8 +33,16 @@
         h1 {
             text-align: center;
             color: #1a1a2e;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             font-size: 1.8rem;
+        }
+
+        .level-display {
+            text-align: center;
+            color: #4a90d9;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
         }
 
         .controls {
@@ -73,7 +81,6 @@
 
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(9, 1fr);
             gap: 0;
             border: 3px solid #1a1a2e;
             border-radius: 4px;
@@ -202,7 +209,8 @@
 
         .success-message button {
             background: #27ae60;
-            padding: 12px 30px;
+            padding: 12px 24px;
+            margin: 5px;
         }
 
         .success-message button:hover {
@@ -261,7 +269,7 @@
 <body>
     <div class="game-container">
         <h1>数独游戏</h1>
-
+        <div class="level-display" id="levelText">第 1 关 / 共 50 关</div>
         <div class="controls">
             <select id="difficulty">
                 <option value="easy">简单</option>
@@ -271,9 +279,7 @@
             <button id="newGameBtn">新游戏</button>
             <button id="resetBtn">重置</button>
         </div>
-
         <div class="grid-container" id="grid"></div>
-
         <div class="number-pad" id="numberPad"></div>
     </div>
 
@@ -282,62 +288,102 @@
         <h2>恭喜完成!</h2>
         <p>你成功解开了这个数独谜题</p>
         <button id="playAgainBtn">再玩一次</button>
+        <button id="nextLevelBtn">下一关</button>
     </div>
 
     <script>
-        // Game state
+        const ANIMALS = ['🐶', '🐱', '🐭', '🐰', '🦊', '🐻', '🐼', '🐨', '🦁'];
+
+        const DIFFICULTY_CONFIG = {
+            easy: {
+                name: '简单',
+                rows: 3,
+                cols: 3,
+                boxRows: 3,
+                boxCols: 3,
+                removeMin: 2,
+                removeMax: 5,
+                useAnimal: true
+            },
+            medium: {
+                name: '中等',
+                rows: 3,
+                cols: 9,
+                boxRows: 1,
+                boxCols: 3,
+                removeMin: 4,
+                removeMax: 10,
+                useAnimal: true
+            },
+            hard: {
+                name: '困难',
+                rows: 9,
+                cols: 9,
+                boxRows: 3,
+                boxCol: 3,
+                removeMin: 30,
+                removeMax: 50,
+                useAnimal: false
+            }
+        };
+
+        let currentDifficulty = 'easy';
+        let currentLevel = 1;
         let solution = [];
         let puzzle = [];
         let initialPuzzle = [];
         let selectedCell = null;
 
-        const DIFFICULTY = {
-            easy: 30,
-            medium: 40,
-            hard: 50
-        };
+        function getProgress(difficulty) {
+            return parseInt(localStorage.getItem('sudoku_progress_' + difficulty)) || 1;
+        }
 
-        // Sudoku generation using backtracking
-        function isValidPlacement(board, row, col, num) {
-            // Check row
-            for (let x = 0; x < 9; x++) {
-                if (board[row * 9 + x] === num) return false;
+        function saveProgress(difficulty, level) {
+            const current = getProgress(difficulty);
+            if (level > current) {
+                localStorage.setItem('sudoku_progress_' + difficulty, level);
             }
+        }
 
-            // Check column
-            for (let x = 0; x < 9; x++) {
-                if (board[x * 9 + col] === num) return false;
+        function getRemoveCount(difficulty, level) {
+            const config = DIFFICULTY_CONFIG[difficulty];
+            const ratio = (level - 1) / 49;
+            return Math.round(config.removeMin + (config.removeMax - config.removeMin) * ratio);
+        }
+
+        function isValidPlacement(board, r, c, num, totalRows, totalCols, boxR, boxC) {
+            for (let x = 0; x < totalCols; x++) {
+                if (board[r * totalCols + x] === num) return false;
             }
-
-            // Check 3x3 box
-            const boxRow = Math.floor(row / 3) * 3;
-            const boxCol = Math.floor(col / 3) * 3;
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 3; j++) {
-                    if (board[(boxRow + i) * 9 + (boxCol + j)] === num) return false;
+            for (let x = 0; x < totalRows; x++) {
+                if (board[x * totalCols + c] === num) return false;
+            }
+            const boxRow = Math.floor(r / boxR) * boxR;
+            const boxCol = Math.floor(c / boxC) * boxC;
+            for (let i = 0; i < boxR; i++) {
+                for (let j = 0; j < boxC; j++) {
+                    if (board[(boxRow + i) * totalCols + (boxCol + j)] === num) return false;
                 }
             }
-
             return true;
         }
 
-        function solveSudoku(board, row = 0, col = 0) {
-            if (row === 9) return true;
-            if (col === 9) return solveSudoku(board, row + 1, 0);
-
-            if (board[row * 9 + col] !== 0) {
-                return solveSudoku(board, row, col + 1);
+        function solveSudoku(board, rows, cols, boxR, boxC, r, c) {
+            r = r || 0;
+            c = c || 0;
+            if (r === rows) return true;
+            if (c === cols) return solveSudoku(board, rows, cols, boxR, boxC, r + 1, 0);
+            if (board[r * cols + c] !== 0) {
+                return solveSudoku(board, rows, cols, boxR, boxC, r, c + 1);
             }
-
             const nums = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-            for (const num of nums) {
-                if (isValidPlacement(board, row, col, num)) {
-                    board[row * 9 + col] = num;
-                    if (solveSudoku(board, row, col + 1)) return true;
-                    board[row * 9 + col] = 0;
+            for (let num of nums) {
+                if (isValidPlacement(board, r, c, num, rows, cols, boxR, boxC)) {
+                    board[r * cols + c] = num;
+                    if (solveSudoku(board, rows, cols, boxR, boxC, r, c + 1)) return true;
+                    board[r * cols + c] = 0;
                 }
             }
-
             return false;
         }
 
@@ -350,42 +396,55 @@
             return arr;
         }
 
-        function generateSudoku() {
-            // Create empty board
-            const board = new Array(81).fill(0);
-            solveSudoku(board);
+        function generateSudoku(difficulty) {
+            const config = DIFFICULTY_CONFIG[difficulty];
+            const rows = config.rows;
+            const cols = config.cols;
+            const boxR = config.boxRows;
+            const boxC = config.boxCols;
+            const board = new Array(rows * col).fill(0);
+            solveSudoku(board, rows, col, boxR, boxC);
             return board;
         }
 
-        function removeNumbers(board, count) {
-            const positions = shuffleArray([...Array(81).keys()]);
+        function removeNumbers(board, count, total) {
+            const positions = shuffleArray([...Array(total).keys()]);
             let removed = 0;
-
-            for (const pos of positions) {
+            for (let pos of positions) {
                 if (removed >= count) break;
-                const backup = board[pos];
                 board[pos] = 0;
                 removed++;
             }
-
             return board;
         }
 
-        // UI Rendering
+        function getDisplayValue(num, useAnimal) {
+            if (num === 0) return '';
+            if (useAnimal && num >= 1 && num <= 9) {
+                return ANIMALS[num - 1];
+            }
+            return num;
+        }
+
         function renderGrid() {
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
+            const config = DIFFICULTY_CONFIG[currentDifficulty];
+            const cols = config.col;
+            const rows = config.rows;
+            const useAnimal = config.useAnimal;
+            const total = row * col;
 
-            for (let i = 0; i < 81; i++) {
+            grid.style.gridTemplateColumns = 'repeat(' + col + ', 1fr)';
+
+            for (let i = 0; i < total; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
                 cell.dataset.index = i;
-
                 if (puzzle[i] !== 0) {
-                    cell.textContent = puzzle[i];
+                    cell.textContent = getDisplayValue(puzzle[i], useAnimal);
                     cell.classList.add('locked');
                 }
-
                 cell.addEventListener('click', () => selectCell(i));
                 grid.appendChild(cell);
             }
@@ -394,11 +453,13 @@
         function renderNumberPad() {
             const pad = document.getElementById('numberPad');
             pad.innerHTML = '';
+            const config = DIFFICULTY_CONFIG[currentDifficulty];
+            const useAnimal = config.useAnimal;
 
             for (let i = 1; i <= 9; i++) {
                 const btn = document.createElement('button');
                 btn.className = 'num-btn';
-                btn.textContent = i;
+                btn.textContent = getDisplayValue(i, useAnimal);
                 btn.addEventListener('click', () => inputNumber(i));
                 pad.appendChild(btn);
             }
@@ -410,56 +471,44 @@
             pad.appendChild(clearBtn);
         }
 
-        // Cell selection and input
         function selectCell(index) {
-            // Cannot select locked cells
             if (initialPuzzle[index] !== 0) return;
-
-            // Clear previous selection
             if (selectedCell !== null) {
-                const prev = document.querySelector(`.cell[data-index="${selectedCell}"]`);
+                const prev = document.querySelector('.cell[data-index="' + selectedCell + '"]');
                 if (prev) prev.classList.remove('selected');
             }
-
             selectedCell = index;
-            const cell = document.querySelector(`.cell[data-index="${index}"]`);
+            const cell = document.querySelector('.cell[data-index="' + index + '"]');
             cell.classList.add('selected');
         }
 
         function inputNumber(num) {
             if (selectedCell === null) return;
-
             const index = selectedCell;
             puzzle[index] = num;
-
-            const cell = document.querySelector(`.cell[data-index="${index}"]`);
-            cell.textContent = num;
+            const config = DIFFICULTY_CONFIG[currentDifficulty];
+            const cell = document.querySelector('.cell[data-index="' + index + '"]');
+            cell.textContent = getDisplayValue(num, config.useAnimal);
             cell.classList.remove('selected');
             selectedCell = null;
-
-            // Validation
             validateCell(index);
             checkCompletion();
         }
 
         function clearCell() {
             if (selectedCell === null) return;
-
             const index = selectedCell;
             puzzle[index] = 0;
-
-            const cell = document.querySelector(`.cell[data-index="${index}"]`);
+            const cell = document.querySelector('.cell[data-index="' + index + '"]');
             cell.textContent = '';
             cell.classList.remove('selected', 'correct', 'incorrect');
             selectedCell = null;
         }
 
         function validateCell(index) {
-            const cell = document.querySelector(`.cell[data-index="${index}"]`);
+            const cell = document.querySelector('.cell[data-index="' + index + '"]');
             cell.classList.remove('correct', 'incorrect');
-
             if (puzzle[index] === 0) return;
-
             if (puzzle[index] === solution[index]) {
                 cell.classList.add('correct');
                 setTimeout(() => cell.classList.remove('correct'), 500);
@@ -470,38 +519,70 @@
         }
 
         function checkCompletion() {
-            for (let i = 0; i < 81; i++) {
+            const config = DIFFICULTY_CONFIG[currentDifficulty];
+            const row = config.rows;
+            const col = config.col;
+            const total = row * col;
+            for (let i = 0; i < total; i++) {
                 if (puzzle[i] !== solution[i]) return;
             }
-
-            // All correct!
+            levelComplete();
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('successMessage').style.display = 'block';
         }
 
-        // Game controls
-        function newGame() {
-            const difficulty = document.getElementById('difficulty').value;
-            const removeCount = DIFFICULTY[difficulty];
+        function updateLevelDisplay() {
+            document.getElementById('levelText').textContent = '第 ' + currentLevel + ' 关 / 共 50 关';
+        }
 
-            solution = generateSudoku();
+        function levelComplete() {
+            const config = DIFFICULTY_CONFIG[currentDifficulty];
+            const msgEl = document.querySelector('#successMessage p');
+            if (currentLevel >= 50) {
+                msgEl.textContent = config.name + ' 全部 50 关已完成！太厉害了！';
+            } else {
+                msgEl.textContent = config.name + ' 第 ' + currentLevel + ' 关完成！';
+                saveProgress(currentDifficulty, currentLevel + 1);
+            }
+        }
+
+        function newGame() {
+            currentDifficulty = document.getElementById('difficulty').value;
+            currentLevel = getProgress(currentDifficulty);
+
+            const config = DIFFICULTY_CONFIG[currentDifficulty];
+            const row = config.rows;
+            const col = config.col;
+            const total = row * col;
+
+            const removeCount = getRemoveCount(currentDifficulty, currentLevel);
+            solution = generateSudoku(currentDifficulty);
             puzzle = [...solution];
-            removeNumbers(puzzle, removeCount);
+            removeNumbers(puzzle, removeCount, total);
             initialPuzzle = [...puzzle];
             selectedCell = null;
 
             renderGrid();
+            renderNumberPad();
+            updateLevelDisplay();
             hideSuccessMessage();
+        }
+
+        function onDifficultyChange() {
+            currentDifficulty = document.getElementById('difficulty').value;
+            currentLevel = getProgress(currentDifficulty);
+            newGame();
         }
 
         function resetGame() {
             puzzle = [...initialPuzzle];
             selectedCell = null;
-
+            const config = DIFFICULTY_CONFIG[currentDifficulty];
+            const useAnimal = config.useAnimal;
             const cells = document.querySelectorAll('.cell');
             cells.forEach((cell, index) => {
                 const val = puzzle[index];
-                cell.textContent = val || '';
+                cell.textContent = getDisplayValue(val, useAnimal);
                 cell.classList.remove('selected', 'correct', 'incorrect');
                 if (val !== 0) {
                     cell.classList.add('locked');
@@ -509,7 +590,6 @@
                     cell.classList.remove('locked');
                 }
             });
-
             hideSuccessMessage();
         }
 
@@ -518,10 +598,16 @@
             document.getElementById('successMessage').style.display = 'none';
         }
 
-        // Keyboard input
+        function nextLevel() {
+            if (currentLevel < 50) {
+                currentLevel++;
+                localStorage.setItem('sudoku_progress_' + currentDifficulty, currentLevel);
+            }
+            newGame();
+        }
+
         document.addEventListener('keydown', (e) => {
             if (selectedCell === null) return;
-
             const key = e.key;
             if (key >= '1' && key <= '9') {
                 inputNumber(parseInt(key));
@@ -530,17 +616,19 @@
             }
         });
 
-        // Button event listeners
         document.getElementById('newGameBtn').addEventListener('click', newGame);
         document.getElementById('resetBtn').addEventListener('click', resetGame);
+        document.getElementById('difficulty').addEventListener('change', onDifficultyChange);
         document.getElementById('playAgainBtn').addEventListener('click', () => {
             hideSuccessMessage();
             newGame();
         });
+        document.getElementById('nextLevelBtn').addEventListener('click', () => {
+            hideSuccessMessage();
+            nextLevel();
+        });
 
-        // Initialize
         newGame();
-        renderNumberPad();
     </script>
 </body>
 </html>
