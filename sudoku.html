@@ -300,19 +300,21 @@
                 rows: 3,
                 cols: 3,
                 boxRows: 3,
-                boxCols: 3,
+                boxCol: 3,
                 removeMin: 2,
-                removeMax: 5,
+                removeMax: 4,
+                animalCount: 3,
                 useAnimal: true
             },
             medium: {
                 name: '中等',
-                rows: 3,
-                cols: 9,
-                boxRows: 1,
-                boxCols: 3,
+                rows: 6,
+                cols: 6,
+                boxRows: 2,
+                boxCol: 3,
                 removeMin: 4,
-                removeMax: 10,
+                removeMax: 8,
+                animalCount: 6,
                 useAnimal: true
             },
             hard: {
@@ -323,7 +325,8 @@
                 boxCol: 3,
                 removeMin: 30,
                 removeMax: 50,
-                useAnimal: false
+                animalCount: 9,
+                useAnimal: true
             }
         };
 
@@ -333,6 +336,7 @@
         let puzzle = [];
         let initialPuzzle = [];
         let selectedCell = null;
+        let currentAnimals = [];
 
         function getProgress(difficulty) {
             return parseInt(localStorage.getItem('sudoku_progress_' + difficulty)) || 1;
@@ -372,16 +376,16 @@
             r = r || 0;
             c = c || 0;
             if (r === rows) return true;
-            if (c === cols) return solveSudoku(board, rows, cols, boxR, boxC, r + 1, 0);
-            if (board[r * cols + c] !== 0) {
-                return solveSudoku(board, rows, cols, boxR, boxC, r, c + 1);
+            if (c === cols) return solveSudoku(board, rows, col, boxR, boxC, r + 1, 0);
+            if (board[r * col + c] !== 0) {
+                return solveSudoku(board, rows, col, boxR, boxC, r, c + 1);
             }
             const nums = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
             for (let num of nums) {
-                if (isValidPlacement(board, r, c, num, rows, cols, boxR, boxC)) {
-                    board[r * cols + c] = num;
-                    if (solveSudoku(board, rows, cols, boxR, boxC, r, c + 1)) return true;
-                    board[r * cols + c] = 0;
+                if (isValidPlacement(board, r, c, num, rows, col, boxR, boxC)) {
+                    board[r * col + c] = num;
+                    if (solveSudoku(board, rows, col, boxR, boxC, r, c + 1)) return true;
+                    board[r * col + c] = 0;
                 }
             }
             return false;
@@ -401,16 +405,16 @@
             const rows = config.rows;
             const col = config.cols;
             const boxR = config.boxRows;
-            const boxC = config.boxCols;
+            const boxC = config.boxCol;
             const board = new Array(rows * col).fill(0);
             solveSudoku(board, rows, col, boxR, boxC);
             return board;
         }
 
         function removeNumbers(board, count, total) {
-            const positions = shuffleArray([...Array(total).keys()]);
+            const position = shuffleArray([...Array(total).keys()]);
             let removed = 0;
-            for (let pos of positions) {
+            for (let pos of position) {
                 if (removed >= count) break;
                 board[pos] = 0;
                 removed++;
@@ -418,10 +422,15 @@
             return board;
         }
 
+        function selectRandomAnimals(count) {
+            const shuffled = shuffleArray([...ANIMALS]);
+            return shuffled.slice(0, count);
+        }
+
         function getDisplayValue(num, useAnimal) {
             if (num === 0) return '';
-            if (useAnimal && num >= 1 && num <= 9) {
-                return ANIMALS[num - 1];
+            if (useAnimal && currentAnimals.length > 0 && num >= 1 && num <= currentAnimals.length) {
+                return currentAnimals[num - 1];
             }
             return num;
         }
@@ -430,12 +439,12 @@
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
             const config = DIFFICULTY_CONFIG[currentDifficulty];
-            const cols = config.cols;
-            const rows = config.rows;
+            const col = config.cols;
+            const row = config.rows;
             const useAnimal = config.useAnimal;
-            const total = rows * cols;
+            const total = row * col;
 
-            grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+            grid.style.gridTemplateColumns = 'repeat(' + col + ', 1fr)';
 
             for (let i = 0; i < total; i++) {
                 const cell = document.createElement('div');
@@ -554,6 +563,9 @@
             const row = config.rows;
             const col = config.cols;
             const total = row * col;
+
+            // 根据难度随机选择对应数量的小动物
+            currentAnimals = selectRandomAnimals(config.animalCount);
 
             const removeCount = getRemoveCount(currentDifficulty, currentLevel);
             solution = generateSudoku(currentDifficulty);
