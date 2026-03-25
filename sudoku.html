@@ -402,8 +402,8 @@
             const col = config.cols;
             const boxR = config.boxRows;
             const boxC = config.boxCols;
-            const board = new Array(rows * cols).fill(0);
-            solveSudoku(board, rows, cols, boxR, boxC);
+            const board = new Array(rows * col).fill(0);
+            solveSudoku(board, rows, col, boxR, boxC);
             return board;
         }
 
@@ -433,7 +433,7 @@
             const cols = config.cols;
             const rows = config.rows;
             const useAnimal = config.useAnimal;
-            const total = row * col;
+            const total = rows * cols;
 
             grid.style.gridTemplateColumns = 'repeat(' + col + ', 1fr)';
 
@@ -522,7 +522,7 @@
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const row = config.rows;
             const col = config.cols;
-            const total = row * col;
+            const total = rows * cols;
             for (let i = 0; i < total; i++) {
                 if (puzzle[i] !== solution[i]) return;
             }
@@ -553,7 +553,7 @@
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const row = config.rows;
             const col = config.cols;
-            const total = row * col;
+            const total = rows * cols;
 
             const removeCount = getRemoveCount(currentDifficulty, currentLevel);
             solution = generateSudoku(currentDifficulty);
