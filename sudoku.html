@@ -376,16 +376,16 @@
             r = r || 0;
             c = c || 0;
             if (r === rows) return true;
-            if (c === cols) return solveSudoku(board, rows, col, boxR, boxC, r + 1, 0);
-            if (board[r * col + c] !== 0) {
-                return solveSudoku(board, rows, col, boxR, boxC, r, c + 1);
+            if (c === cols) return solveSudoku(board, rows, cols, boxR, boxC, r + 1, 0);
+            if (board[r * cols + c] !== 0) {
+                return solveSudoku(board, rows, cols, boxR, boxC, r, c + 1);
             }
             const nums = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
             for (let num of nums) {
-                if (isValidPlacement(board, r, c, num, rows, col, boxR, boxC)) {
-                    board[r * col + c] = num;
-                    if (solveSudoku(board, rows, col, boxR, boxC, r, c + 1)) return true;
-                    board[r * col + c] = 0;
+                if (isValidPlacement(board, r, c, num, rows, cols, boxR, boxC)) {
+                    board[r * cols + c] = num;
+                    if (solveSudoku(board, rows, cols, boxR, boxC, r, c + 1)) return true;
+                    board[r * cols + c] = 0;
                 }
             }
             return false;
@@ -403,11 +403,11 @@
         function generateSudoku(difficulty) {
             const config = DIFFICULTY_CONFIG[difficulty];
             const rows = config.rows;
-            const col = config.cols;
+            const cols = config.cols;
             const boxR = config.boxRows;
             const boxC = config.boxCol;
-            const board = new Array(rows * col).fill(0);
-            solveSudoku(board, rows, col, boxR, boxC);
+            const board = new Array(rows * cols).fill(0);
+            solveSudoku(board, rows, cols, boxR, boxC);
             return board;
         }
 
@@ -439,12 +439,12 @@
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
             const config = DIFFICULTY_CONFIG[currentDifficulty];
-            const col = config.cols;
+            const cols = config.cols;
             const row = config.rows;
             const useAnimal = config.useAnimal;
-            const total = row * col;
+            const total = row * cols;
 
-            grid.style.gridTemplateColumns = 'repeat(' + col + ', 1fr)';
+            grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
 
             for (let i = 0; i < total; i++) {
                 const cell = document.createElement('div');
@@ -530,8 +530,8 @@
         function checkCompletion() {
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const row = config.rows;
-            const col = config.cols;
-            const total = row * col;
+            const cols = config.cols;
+            const total = row * cols;
             for (let i = 0; i < total; i++) {
                 if (puzzle[i] !== solution[i]) return;
             }
@@ -561,8 +561,8 @@
 
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const row = config.rows;
-            const col = config.cols;
-            const total = row * col;
+            const cols = config.cols;
+            const total = row * cols;
 
             // 根据难度随机选择对应数量的小动物
             currentAnimals = selectRandomAnimals(config.animalCount);
