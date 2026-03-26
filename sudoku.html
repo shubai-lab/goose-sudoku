@@ -387,17 +387,28 @@
         }
 
         function isValidPlacement(board, r, c, num, totalRows, totalCols, boxR, boxC) {
+            console.log('isValidPlacement:', {r, c, num, totalRows, totalCols, boxR, boxC});
             for (let x = 0; x < totalCols; x++) {
-                if (board[r * totalCols + x] === num) return false;
+                if (board[r * totalCols + x] === num) {
+                    console.log('Invalid: num', num, 'exists in row at col', x);
+                    return false;
+                }
             }
             for (let x = 0; x < totalRows; x++) {
-                if (board[x * totalCols + c] === num) return false;
+                if (board[x * totalCols + c] === num) {
+                    console.log('Invalid: num', num, 'exists in col at row', x);
+                    return false;
+                }
             }
             const boxRow = Math.floor(r / boxR) * boxR;
             const boxCol = Math.floor(c / boxC) * boxC;
+            console.log('Checking box:', {boxRow, boxCol, boxR, boxC});
             for (let i = 0; i < boxR; i++) {
                 for (let j = 0; j < boxC; j++) {
-                    if (board[(boxRow + i) * totalCols + (boxCol + j)] === num) return false;
+                    if (board[(boxRow + i) * totalCols + (boxCol + j)] === num) {
+                        console.log('Invalid: num', num, 'exists in box at', boxRow + i, boxCol + j);
+                        return false;
+                    }
                 }
             }
             return true;
