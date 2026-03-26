@@ -461,9 +461,11 @@
 
         function getDisplayValue(num, useAnimal, animalCount) {
             if (num === 0) return '';
-            console.log('getDisplayValue:', {num, useAnimal, animalCount, currentAnimalsLength: currentAnimals.length});
+            console.log('getDisplayValue:', {num, useAnimal, animalCount, currentAnimalsLength: currentAnimals.length, currentAnimals});
             if (useAnimal && currentAnimals.length > 0 && num >= 1 && num <= animalCount) {
-                return currentAnimals[num - 1];
+                const result = currentAnimals[num - 1];
+                console.log('returning animal:', result);
+                return result;
             }
             return num;
         }
