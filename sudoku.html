@@ -102,34 +102,45 @@
             user-select: none;
         }
 
-        .cell:nth-child(3n) {
+        /* 9x9 模式的3x3宫格边框 - 列 */
+        .grid-container.medium .cell:nth-child(3n),
+        .grid-container.medium .cell:nth-child(6n) {
             border-right: 2px solid #1a1a2e;
         }
-
-        .cell:nth-child(9n) {
+        .grid-container.medium .cell:nth-child(9n) {
             border-right: 1px solid #ccc;
         }
 
-        /* 9x9 模式的3x3宫格边框 */
-        .cell:nth-child(n+19):nth-child(-n+27),
-        .cell:nth-child(n+46):nth-child(-n+54) {
+        /* 9x9 模式的3x3宫格边框 - 行 */
+        .grid-container.medium .cell:nth-child(n+19):nth-child(-n+27),
+        .grid-container.medium .cell:nth-child(n+46):nth-child(-n+54) {
             border-bottom: 2px solid #1a1a2e;
         }
 
-        /* 4x4 模式的2x2宫格边框 */
-        .grid-container.easy .cell:nth-child(n+13):nth-child(-n+16) {
-            border-bottom: 2px solid #1a1a2e;
+        /* 4x4 模式的2x2宫格边框 - 列 */
+        .grid-container.easy .cell:nth-child(2n) {
+            border-right: 2px solid #1a1a2e;
         }
         .grid-container.easy .cell:nth-child(4n) {
-            border-right: 2px solid #1a1a2e;
+            border-right: 1px solid #ccc;
         }
 
-        /* 3x3 模式的3x3宫格边框 */
-        .grid-container.mini .cell:nth-child(n+7):nth-child(-n+9) {
+        /* 4x4 模式的2x2宫格边框 - 行 */
+        .grid-container.easy .cell:nth-child(n+9):nth-child(-n+12) {
             border-bottom: 2px solid #1a1a2e;
         }
+
+        /* 3x3 模式的3x3宫格边框 - 列 */
         .grid-container.mini .cell:nth-child(3n) {
             border-right: 2px solid #1a1a2e;
+        }
+        .grid-container.mini .cell:nth-child(9n) {
+            border-right: 1px solid #ccc;
+        }
+
+        /* 3x3 模式的3x3宫格边框 - 行 */
+        .grid-container.mini .cell:nth-child(n+7):nth-child(-n+9) {
+            border-bottom: 2px solid #1a1a2e;
         }
 
         .cell.locked {
@@ -465,8 +476,11 @@
             const useAnimal = config.useAnimal;
             const total = row * col;
 
-            grid.style.gridTemplateColumn = 'repeat(' + col + ', 1fr)';
+            grid.style.gridTemplateColumns = 'repeat(' + col + ', 1fr)';
+            grid.style.gridTemplateRows = 'repeat(' + row + ', 1fr)';
             grid.className = 'grid-container ' + currentDifficulty;
+
+            console.log('Rendering grid:', currentDifficulty, row, 'x', col, 'total:', total);
 
             for (let i = 0; i < total; i++) {
                 const cell = document.createElement('div');
@@ -494,7 +508,7 @@
             for (let i = 1; i <= numCount; i++) {
                 const btn = document.createElement('button');
                 btn.className = 'num-btn';
-                btn.textContent = getDisplayValue(i, useAnimal, numCount);
+                btn.textContent = getDisplayValue(i, useAnimal, config.animalCount);
                 btn.addEventListener('click', () => inputNumber(i));
                 pad.appendChild(btn);
             }
@@ -523,7 +537,7 @@
             puzzle[index] = num;
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const cell = document.querySelector('.cell[data-index="' + index + '"]');
-            cell.textContent = getDisplayValue(num, config.useAnimal, config.nums);
+            cell.textContent = getDisplayValue(num, config.useAnimal, config.animalCount);
             cell.classList.remove('selected');
             selectedCell = null;
             validateCell(index);
