@@ -406,6 +406,7 @@
         function solveSudoku(board, rows, cols, boxR, boxC, nums, r, c) {
             r = r || 0;
             c = c || 0;
+            console.log('solveSudoku called:', {r, c, rows, cols, boardAtR0: board[0], boardAtR1: board[1], boardAtR2: board[2]});
             if (r === rows) return true;
             if (c === cols) return solveSudoku(board, rows, cols, boxR, boxC, nums, r + 1, 0);
             if (board[r * cols + c] !== 0) {
