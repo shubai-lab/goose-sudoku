@@ -110,9 +110,26 @@
             border-right: 1px solid #ccc;
         }
 
+        /* 9x9 模式的3x3宫格边框 */
         .cell:nth-child(n+19):nth-child(-n+27),
         .cell:nth-child(n+46):nth-child(-n+54) {
             border-bottom: 2px solid #1a1a2e;
+        }
+
+        /* 4x4 模式的2x2宫格边框 */
+        .grid-container.easy .cell:nth-child(n+13):nth-child(-n+16) {
+            border-bottom: 2px solid #1a1a2e;
+        }
+        .grid-container.easy .cell:nth-child(4n) {
+            border-right: 2px solid #1a1a2e;
+        }
+
+        /* 3x3 模式的3x3宫格边框 */
+        .grid-container.mini .cell:nth-child(n+7):nth-child(-n+9) {
+            border-bottom: 2px solid #1a1a2e;
+        }
+        .grid-container.mini .cell:nth-child(3n) {
+            border-right: 2px solid #1a1a2e;
         }
 
         .cell.locked {
@@ -379,16 +396,16 @@
             r = r || 0;
             c = c || 0;
             if (r === rows) return true;
-            if (c === cols) return solveSudoku(board, rows, cols, boxR, boxC, nums, r + 1, 0);
-            if (board[r * cols + c] !== 0) {
-                return solveSudoku(board, rows, cols, boxR, boxC, nums, r, c + 1);
+            if (c === cols) return solveSudoku(board, rows, col, boxR, boxC, nums, r + 1, 0);
+            if (board[r * col + c] !== 0) {
+                return solveSudoku(board, rows, col, boxR, boxC, nums, r, c + 1);
             }
             const shuffledNums = shuffleArray([...nums]);
             for (let num of shuffledNums) {
-                if (isValidPlacement(board, r, c, num, rows, cols, boxR, boxC)) {
-                    board[r * cols + c] = num;
-                    if (solveSudoku(board, rows, cols, boxR, boxC, nums, r, c + 1)) return true;
-                    board[r * cols + c] = 0;
+                if (isValidPlacement(board, r, c, num, rows, col, boxR, boxC)) {
+                    board[r * col + c] = num;
+                    if (solveSudoku(board, rows, col, boxR, boxC, nums, r, c + 1)) return true;
+                    board[r * col + c] = 0;
                 }
             }
             return false;
@@ -406,12 +423,12 @@
         function generateSudoku(difficulty) {
             const config = DIFFICULTY_CONFIG[difficulty];
             const rows = config.rows;
-            const cols = config.cols;
+            const col = config.col;
             const boxR = config.boxRows;
             const boxC = config.boxCol;
             const nums = Array.from({length: config.nums}, (_, i) => i + 1);
-            const board = new Array(rows * cols).fill(0);
-            solveSudoku(board, rows, cols, boxR, boxC, nums);
+            const board = new Array(rows * col).fill(0);
+            solveSudoku(board, rows, col, boxR, boxC, nums);
             return board;
         }
 
@@ -443,12 +460,13 @@
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
             const config = DIFFICULTY_CONFIG[currentDifficulty];
-            const cols = config.cols;
+            const col = config.col;
             const row = config.rows;
             const useAnimal = config.useAnimal;
-            const total = row * cols;
+            const total = row * col;
 
-            grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+            grid.style.gridTemplateColumn = 'repeat(' + col + ', 1fr)';
+            grid.className = 'grid-container ' + currentDifficulty;
 
             for (let i = 0; i < total; i++) {
                 const cell = document.createElement('div');
@@ -538,8 +556,8 @@
         function checkCompletion() {
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const row = config.rows;
-            const cols = config.cols;
-            const total = row * cols;
+            const col = config.col;
+            const total = row * col;
             for (let i = 0; i < total; i++) {
                 if (puzzle[i] !== solution[i]) return;
             }
@@ -569,8 +587,8 @@
 
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const row = config.rows;
-            const cols = config.cols;
-            const total = row * cols;
+            const col = config.col;
+            const total = row * col;
 
             // 根据难度随机选择对应数量的小动物
             currentAnimals = selectRandomAnimals(config.animalCount);
