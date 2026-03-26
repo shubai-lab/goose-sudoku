@@ -431,9 +431,9 @@
             return shuffled.slice(0, count);
         }
 
-        function getDisplayValue(num, useAnimal) {
+        function getDisplayValue(num, useAnimal, animalCount) {
             if (num === 0) return '';
-            if (useAnimal && currentAnimals.length > 0 && num >= 1 && num <= currentAnimals.length) {
+            if (useAnimal && currentAnimals.length > 0 && num >= 1 && num <= animalCount) {
                 return currentAnimals[num - 1];
             }
             return num;
@@ -455,7 +455,7 @@
                 cell.className = 'cell';
                 cell.dataset.index = i;
                 if (puzzle[i] !== 0) {
-                    cell.textContent = getDisplayValue(puzzle[i], useAnimal);
+                    cell.textContent = getDisplayValue(puzzle[i], useAnimal, config.animalCount);
                     cell.classList.add('locked');
                 }
                 cell.addEventListener('click', () => selectCell(i));
@@ -476,7 +476,7 @@
             for (let i = 1; i <= numCount; i++) {
                 const btn = document.createElement('button');
                 btn.className = 'num-btn';
-                btn.textContent = getDisplayValue(i, useAnimal);
+                btn.textContent = getDisplayValue(i, useAnimal, numCount);
                 btn.addEventListener('click', () => inputNumber(i));
                 pad.appendChild(btn);
             }
@@ -505,7 +505,7 @@
             puzzle[index] = num;
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const cell = document.querySelector('.cell[data-index="' + index + '"]');
-            cell.textContent = getDisplayValue(num, config.useAnimal);
+            cell.textContent = getDisplayValue(num, config.useAnimal, config.nums);
             cell.classList.remove('selected');
             selectedCell = null;
             validateCell(index);
@@ -602,7 +602,7 @@
             const cells = document.querySelectorAll('.cell');
             cells.forEach((cell, index) => {
                 const val = puzzle[index];
-                cell.textContent = getDisplayValue(val, useAnimal);
+                cell.textContent = getDisplayValue(val, useAnimal, config.animalCount);
                 cell.classList.remove('selected', 'correct', 'incorrect');
                 if (val !== 0) {
                     cell.classList.add('locked');
