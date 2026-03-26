@@ -422,11 +422,11 @@
 
         function generateSudoku(difficulty) {
             const config = DIFFICULTY_CONFIG[difficulty];
-            const rows = config.rows;
-            const cols = config.col;
-            const boxR = config.boxRows;
-            const boxC = config.boxCol;
-            const nums = Array.from({length: config.nums}, (_, i) => i + 1);
+            const rows = config.rows || 9;
+            const cols = config.cols || config.col || 9;
+            const boxR = config.boxRows || 3;
+            const boxC = config.boxCol || 3;
+            const nums = Array.from({length: config.nums || 9}, (_, i) => i + 1);
             const board = new Array(rows * cols).fill(0);
             solveSudoku(board, rows, cols, boxR, boxC, nums);
             return board;
