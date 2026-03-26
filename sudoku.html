@@ -490,6 +490,7 @@
                 cell.className = 'cell';
                 cell.dataset.index = i;
                 if (puzzle[i] !== 0) {
+                    console.log('puzzle[' + i + ']:', puzzle[i]);
                     cell.textContent = getDisplayValue(puzzle[i], useAnimal, config.animalCount);
                     cell.classList.add('locked');
                 }
