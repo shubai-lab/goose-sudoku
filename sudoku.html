@@ -460,7 +460,7 @@
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
             const config = DIFFICULTY_CONFIG[currentDifficulty];
-            const col = config.col;
+            const col = config.cols || config.col || 9;
             const row = config.rows;
             const useAnimal = config.useAnimal;
             const total = row * col;
