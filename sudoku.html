@@ -438,8 +438,11 @@
             const boxR = config.boxRows || 3;
             const boxC = config.boxCol || 3;
             const nums = Array.from({length: config.nums || 9}, (_, i) => i + 1);
+            console.log('generateSudoku:', {difficulty, rows, cols, boxR, boxC, nums});
             const board = new Array(rows * cols).fill(0);
-            solveSudoku(board, rows, cols, boxR, boxC, nums);
+            console.log('board before solve:', board);
+            const result = solveSudoku(board, rows, cols, boxR, boxC, nums);
+            console.log('solve result:', result, 'board after solve:', board);
             return board;
         }
 
