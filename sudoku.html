@@ -272,9 +272,9 @@
         <div class="level-display" id="levelText">第 1 关 / 共 50 关</div>
         <div class="controls">
             <select id="difficulty">
-                <option value="easy">简单</option>
-                <option value="medium" selected>中等</option>
-                <option value="hard">困难</option>
+                <option value="mini">迷你 3×3</option>
+                <option value="easy">简单 4×4</option>
+                <option value="medium" selected>标准 9×9</option>
             </select>
             <button id="newGameBtn">新游戏</button>
             <button id="resetBtn">重置</button>
@@ -295,34 +295,37 @@
         const ANIMALS = ['🐶', '🐱', '🐭', '🐰', '🦊', '🐻', '🐼', '🐨', '🦁'];
 
         const DIFFICULTY_CONFIG = {
-            easy: {
-                name: '简单',
+            mini: {
+                name: '迷你',
                 rows: 3,
                 cols: 3,
                 boxRows: 3,
                 boxCol: 3,
+                nums: 3,
                 removeMin: 2,
                 removeMax: 4,
                 animalCount: 3,
                 useAnimal: true
             },
-            medium: {
-                name: '中等',
-                rows: 6,
-                cols: 6,
+            easy: {
+                name: '简单',
+                rows: 4,
+                cols: 4,
                 boxRows: 2,
-                boxCol: 3,
+                boxCol: 2,
+                nums: 4,
                 removeMin: 4,
-                removeMax: 8,
-                animalCount: 6,
+                removeMax: 6,
+                animalCount: 4,
                 useAnimal: true
             },
-            hard: {
-                name: '困难',
+            medium: {
+                name: '中等',
                 rows: 9,
                 cols: 9,
                 boxRows: 3,
                 boxCol: 3,
+                nums: 9,
                 removeMin: 30,
                 removeMax: 50,
                 animalCount: 9,
@@ -330,7 +333,7 @@
             }
         };
 
-        let currentDifficulty = 'easy';
+        let currentDifficulty = 'medium';
         let currentLevel = 1;
         let solution = [];
         let puzzle = [];
@@ -372,19 +375,19 @@
             return true;
         }
 
-        function solveSudoku(board, rows, cols, boxR, boxC, r, c) {
+        function solveSudoku(board, rows, cols, boxR, boxC, nums, r, c) {
             r = r || 0;
             c = c || 0;
             if (r === rows) return true;
-            if (c === cols) return solveSudoku(board, rows, cols, boxR, boxC, r + 1, 0);
+            if (c === cols) return solveSudoku(board, rows, cols, boxR, boxC, nums, r + 1, 0);
             if (board[r * cols + c] !== 0) {
-                return solveSudoku(board, rows, cols, boxR, boxC, r, c + 1);
+                return solveSudoku(board, rows, cols, boxR, boxC, nums, r, c + 1);
             }
-            const nums = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-            for (let num of nums) {
+            const shuffledNums = shuffleArray([...nums]);
+            for (let num of shuffledNums) {
                 if (isValidPlacement(board, r, c, num, rows, cols, boxR, boxC)) {
                     board[r * cols + c] = num;
-                    if (solveSudoku(board, rows, cols, boxR, boxC, r, c + 1)) return true;
+                    if (solveSudoku(board, rows, cols, boxR, boxC, nums, r, c + 1)) return true;
                     board[r * cols + c] = 0;
                 }
             }
@@ -406,8 +409,9 @@
             const cols = config.cols;
             const boxR = config.boxRows;
             const boxC = config.boxCol;
+            const nums = Array.from({length: config.nums}, (_, i) => i + 1);
             const board = new Array(rows * cols).fill(0);
-            solveSudoku(board, rows, cols, boxR, boxC);
+            solveSudoku(board, rows, cols, boxR, boxC, nums);
             return board;
         }
 
@@ -464,8 +468,12 @@
             pad.innerHTML = '';
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const useAnimal = config.useAnimal;
+            const numCount = config.nums;
 
-            for (let i = 1; i <= 9; i++) {
+            // Set grid columns based on num count
+            pad.style.gridTemplateColumns = 'repeat(' + numCount + ', 1fr)';
+
+            for (let i = 1; i <= numCount; i++) {
                 const btn = document.createElement('button');
                 btn.className = 'num-btn';
                 btn.textContent = getDisplayValue(i, useAnimal);
@@ -621,8 +629,11 @@
         document.addEventListener('keydown', (e) => {
             if (selectedCell === null) return;
             const key = e.key;
-            if (key >= '1' && key <= '9') {
-                inputNumber(parseInt(key));
+            const config = DIFFICULTY_CONFIG[currentDifficulty];
+            const numCount = config.nums;
+            const num = parseInt(key);
+            if (num >= 1 && num <= numCount) {
+                inputNumber(num);
             } else if (key === 'Backspace' || key === 'Delete') {
                 clearCell();
             }
