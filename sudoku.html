@@ -555,8 +555,8 @@
 
         function checkCompletion() {
             const config = DIFFICULTY_CONFIG[currentDifficulty];
-            const row = config.rows;
-            const col = config.col;
+            const row = config.rows || 9;
+            const col = config.cols || config.col || 9;
             const total = row * col;
             for (let i = 0; i < total; i++) {
                 if (puzzle[i] !== solution[i]) return;
@@ -586,8 +586,8 @@
             currentLevel = getProgress(currentDifficulty);
 
             const config = DIFFICULTY_CONFIG[currentDifficulty];
-            const row = config.rows;
-            const col = config.col;
+            const row = config.rows || 9;
+            const col = config.cols || config.col || 9;
             const total = row * col;
 
             // 根据难度随机选择对应数量的小动物
