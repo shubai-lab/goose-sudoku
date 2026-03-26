@@ -614,8 +614,11 @@
 
             const removeCount = getRemoveCount(currentDifficulty, currentLevel);
             solution = generateSudoku(currentDifficulty);
+            console.log('Solution:', solution);
             puzzle = [...solution];
+            console.log('Puzzle before remove:', puzzle);
             removeNumbers(puzzle, removeCount, total);
+            console.log('Puzzle after remove:', puzzle);
             initialPuzzle = [...puzzle];
             selectedCell = null;
 
