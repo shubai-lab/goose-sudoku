@@ -490,8 +490,9 @@
                 cell.className = 'cell';
                 cell.dataset.index = i;
                 if (puzzle[i] !== 0) {
-                    console.log('puzzle[' + i + ']:', puzzle[i]);
-                    cell.textContent = getDisplayValue(puzzle[i], useAnimal, config.animalCount);
+                    const val = getDisplayValue(puzzle[i], useAnimal, config.animalCount);
+                    console.log('cell[' + i + '] puzzle=' + puzzle[i] + ' getDisplayValue returned:', val, 'isEmpty:', val === '');
+                    cell.textContent = val;
                     cell.classList.add('locked');
                 }
                 cell.addEventListener('click', () => selectCell(i));
