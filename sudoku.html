@@ -396,16 +396,16 @@
             r = r || 0;
             c = c || 0;
             if (r === rows) return true;
-            if (c === cols) return solveSudoku(board, rows, col, boxR, boxC, nums, r + 1, 0);
-            if (board[r * col + c] !== 0) {
-                return solveSudoku(board, rows, col, boxR, boxC, nums, r, c + 1);
+            if (c === cols) return solveSudoku(board, rows, cols, boxR, boxC, nums, r + 1, 0);
+            if (board[r * cols + c] !== 0) {
+                return solveSudoku(board, rows, cols, boxR, boxC, nums, r, c + 1);
             }
             const shuffledNums = shuffleArray([...nums]);
             for (let num of shuffledNums) {
-                if (isValidPlacement(board, r, c, num, rows, col, boxR, boxC)) {
-                    board[r * col + c] = num;
-                    if (solveSudoku(board, rows, col, boxR, boxC, nums, r, c + 1)) return true;
-                    board[r * col + c] = 0;
+                if (isValidPlacement(board, r, c, num, rows, cols, boxR, boxC)) {
+                    board[r * cols + c] = num;
+                    if (solveSudoku(board, rows, cols, boxR, boxC, nums, r, c + 1)) return true;
+                    board[r * cols + c] = 0;
                 }
             }
             return false;
@@ -423,12 +423,12 @@
         function generateSudoku(difficulty) {
             const config = DIFFICULTY_CONFIG[difficulty];
             const rows = config.rows;
-            const col = config.col;
+            const cols = config.col;
             const boxR = config.boxRows;
             const boxC = config.boxCol;
             const nums = Array.from({length: config.nums}, (_, i) => i + 1);
-            const board = new Array(rows * col).fill(0);
-            solveSudoku(board, rows, col, boxR, boxC, nums);
+            const board = new Array(rows * cols).fill(0);
+            solveSudoku(board, rows, cols, boxR, boxC, nums);
             return board;
         }
 
