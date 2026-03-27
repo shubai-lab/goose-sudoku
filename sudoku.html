@@ -527,8 +527,10 @@
             const useAnimal = config.useAnimal;
             const numCount = config.nums;
 
-            // Set grid columns based on num count
-            pad.style.gridTemplateColumns = 'repeat(' + numCount + ', 1fr)';
+            // 当数字较多时，分多行显示，避免超出容器
+            const maxCols = 5;
+            const cols = numCount > maxCols ? maxCols : numCount;
+            pad.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
 
             for (let i = 1; i <= numCount; i++) {
                 const btn = document.createElement('button');
@@ -542,6 +544,8 @@
             clearBtn.className = 'num-btn clear-btn';
             clearBtn.textContent = '清除';
             clearBtn.addEventListener('click', () => clearCell());
+            // 清除按钮放在最后一行中间位置
+            clearBtn.style.gridColumn = (cols > 1) ? 'span ' + Math.min(2, cols) : 'span 1';
             pad.appendChild(clearBtn);
         }
 
