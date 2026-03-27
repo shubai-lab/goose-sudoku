@@ -105,7 +105,7 @@
         /* 9x9 模式的3x3宫格边框 - 列 */
         .grid-container.medium .cell:nth-child(3n),
         .grid-container.medium .cell:nth-child(6n) {
-            border-right: 2px solid #1a1a2e;
+            border-right: 2px solid #1a1a2e !important;
         }
         .grid-container.medium .cell:nth-child(9n) {
             border-right: 1px solid #ccc;
@@ -114,25 +114,28 @@
         /* 9x9 模式的3x3宫格边框 - 行 */
         .grid-container.medium .cell:nth-child(n+19):nth-child(-n+27),
         .grid-container.medium .cell:nth-child(n+46):nth-child(-n+54) {
-            border-bottom: 2px solid #1a1a2e;
+            border-bottom: 2px solid #1a1a2e !important;
         }
 
         /* 4x4 模式的2x2宫格边框 - 列 */
-        .grid-container.easy .cell:nth-child(2n) {
-            border-right: 2px solid #1a1a2e;
-        }
-        .grid-container.easy .cell:nth-child(4n) {
-            border-right: 1px solid #ccc;
+        .grid-container.easy .cell:nth-child(2),
+        .grid-container.easy .cell:nth-child(6),
+        .grid-container.easy .cell:nth-child(10),
+        .grid-container.easy .cell:nth-child(14) {
+            border-right: 2px solid #1a1a2e !important;
         }
 
         /* 4x4 模式的2x2宫格边框 - 行 */
-        .grid-container.easy .cell:nth-child(n+9):nth-child(-n+12) {
-            border-bottom: 2px solid #1a1a2e;
+        .grid-container.easy .cell:nth-child(5),
+        .grid-container.easy .cell:nth-child(6),
+        .grid-container.easy .cell:nth-child(7),
+        .grid-container.easy .cell:nth-child(8) {
+            border-bottom: 2px solid #1a1a2e !important;
         }
 
         /* 3x3 模式的3x3宫格边框 - 列 */
         .grid-container.mini .cell:nth-child(3n) {
-            border-right: 2px solid #1a1a2e;
+            border-right: 2px solid #1a1a2e !important;
         }
         .grid-container.mini .cell:nth-child(9n) {
             border-right: 1px solid #ccc;
@@ -140,7 +143,7 @@
 
         /* 3x3 模式的3x3宫格边框 - 行 */
         .grid-container.mini .cell:nth-child(n+7):nth-child(-n+9) {
-            border-bottom: 2px solid #1a1a2e;
+            border-bottom: 2px solid #1a1a2e !important;
         }
 
         .cell.locked {
@@ -327,8 +330,8 @@
                 name: '迷你',
                 rows: 3,
                 cols: 3,
-                boxRows: 3,
-                boxCol: 3,
+                boxRows: 1,
+                boxCol: 1,
                 nums: 3,
                 removeMin: 2,
                 removeMax: 4,
@@ -369,6 +372,14 @@
         let selectedCell = null;
         let currentAnimals = [];
 
+        function getSavedDifficulty() {
+            return localStorage.getItem('sudoku_difficulty') || 'mini';
+        }
+
+        function saveDifficulty(difficulty) {
+            localStorage.setItem('sudoku_difficulty', difficulty);
+        }
+
         function getProgress(difficulty) {
             return parseInt(localStorage.getItem('sudoku_progress_' + difficulty)) || 1;
         }
@@ -387,26 +398,21 @@
         }
 
         function isValidPlacement(board, r, c, num, totalRows, totalCols, boxR, boxC) {
-            console.log('isValidPlacement:', {r, c, num, totalRows, totalCols, boxR, boxC});
             for (let x = 0; x < totalCols; x++) {
                 if (board[r * totalCols + x] === num) {
-                    console.log('Invalid: num', num, 'exists in row at col', x);
                     return false;
                 }
             }
             for (let x = 0; x < totalRows; x++) {
                 if (board[x * totalCols + c] === num) {
-                    console.log('Invalid: num', num, 'exists in col at row', x);
                     return false;
                 }
             }
             const boxRow = Math.floor(r / boxR) * boxR;
             const boxCol = Math.floor(c / boxC) * boxC;
-            console.log('Checking box:', {boxRow, boxCol, boxR, boxC});
             for (let i = 0; i < boxR; i++) {
                 for (let j = 0; j < boxC; j++) {
                     if (board[(boxRow + i) * totalCols + (boxCol + j)] === num) {
-                        console.log('Invalid: num', num, 'exists in box at', boxRow + i, boxCol + j);
                         return false;
                     }
                 }
@@ -417,7 +423,6 @@
         function solveSudoku(board, rows, cols, boxR, boxC, nums, r, c) {
             r = r || 0;
             c = c || 0;
-            console.log('solveSudoku called:', {r, c, rows, cols, boardAtR0: board[0], boardAtR1: board[1], boardAtR2: board[2]});
             if (r === rows) return true;
             if (c === cols) return solveSudoku(board, rows, cols, boxR, boxC, nums, r + 1, 0);
             if (board[r * cols + c] !== 0) {
@@ -645,6 +650,7 @@
 
         function onDifficultyChange() {
             currentDifficulty = document.getElementById('difficulty').value;
+            saveDifficulty(currentDifficulty);
             currentLevel = getProgress(currentDifficulty);
             newGame();
         }
@@ -705,6 +711,12 @@
             hideSuccessMessage();
             nextLevel();
         });
+
+        // 加载保存的难度
+        const savedDifficulty = getSavedDifficulty();
+        document.getElementById('difficulty').value = savedDifficulty;
+        currentDifficulty = savedDifficulty;
+        currentLevel = getProgress(currentDifficulty);
 
         newGame();
     </script>
