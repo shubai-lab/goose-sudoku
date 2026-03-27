@@ -380,6 +380,24 @@
             localStorage.setItem('sudoku_difficulty', difficulty);
         }
 
+        function getSavedPuzzle(difficulty, level) {
+            const key = 'sudoku_puzzle_' + difficulty + '_' + level;
+            const saved = localStorage.getItem(key);
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        function savePuzzle(difficulty, level, puzzle) {
+            const key = 'sudoku_puzzle_' + difficulty + '_' + level;
+            localStorage.setItem(key, JSON.stringify(puzzle));
+        }
+
         function getProgress(difficulty) {
             return parseInt(localStorage.getItem('sudoku_progress_' + difficulty)) || 1;
         }
@@ -571,6 +589,12 @@
             selectedCell = null;
             validateCell(index);
             checkCompletion();
+            savePuzzle(currentDifficulty, currentLevel, {
+                puzzle: puzzle,
+                solution: solution,
+                initialPuzzle: initialPuzzle,
+                animals: currentAnimals
+            });
         }
 
         function clearCell() {
@@ -581,6 +605,12 @@
             cell.textContent = '';
             cell.classList.remove('selected', 'correct', 'incorrect');
             selectedCell = null;
+            savePuzzle(currentDifficulty, currentLevel, {
+                puzzle: puzzle,
+                solution: solution,
+                initialPuzzle: initialPuzzle,
+                animals: currentAnimals
+            });
         }
 
         function validateCell(index) {
@@ -616,6 +646,8 @@
         function levelComplete() {
             const config = DIFFICULTY_CONFIG[currentDifficulty];
             const msgEl = document.querySelector('#successMessage p');
+            // 清除已完成的关卡缓存
+            localStorage.removeItem('sudoku_puzzle_' + currentDifficulty + '_' + currentLevel);
             if (currentLevel >= 50) {
                 msgEl.textContent = config.name + ' 全部 50 关已完成！太厉害了！';
             } else {
@@ -633,17 +665,22 @@
             const col = config.cols || config.col || 9;
             const total = row * col;
 
-            // 根据难度随机选择对应数量的小动物
-            currentAnimals = selectRandomAnimals(config.animalCount);
-
-            const removeCount = getRemoveCount(currentDifficulty, currentLevel);
-            solution = generateSudoku(currentDifficulty);
-            console.log('Solution:', solution);
-            puzzle = [...solution];
-            console.log('Puzzle before remove:', puzzle);
-            removeNumbers(puzzle, removeCount, total);
-            console.log('Puzzle after remove:', puzzle);
-            initialPuzzle = [...puzzle];
+            // 尝试加载已保存的谜题
+            const savedPuzzleData = getSavedPuzzle(currentDifficulty, currentLevel);
+            if (savedPuzzleData) {
+                puzzle = savedPuzzleData.puzzle;
+                solution = savedPuzzleData.solution;
+                initialPuzzle = savedPuzzleData.initialPuzzle;
+                currentAnimals = savedPuzzleData.animals;
+            } else {
+                // 生成新谜题
+                currentAnimals = selectRandomAnimals(config.animalCount);
+                const removeCount = getRemoveCount(currentDifficulty, currentLevel);
+                solution = generateSudoku(currentDifficulty);
+                puzzle = [...solution];
+                removeNumbers(puzzle, removeCount, total);
+                initialPuzzle = [...puzzle];
+            }
             selectedCell = null;
 
             renderGrid();
@@ -653,8 +690,13 @@
         }
 
         function onDifficultyChange() {
-            currentDifficulty = document.getElementById('difficulty').value;
+            const newDifficulty = document.getElementById('difficulty').value;
+            // 如果难度没变，不做任何操作
+            if (newDifficulty === currentDifficulty) return;
+
+            currentDifficulty = newDifficulty;
             saveDifficulty(currentDifficulty);
+            // 切换难度时，加载该难度下当前进度的关卡（保留用户的进度状态）
             currentLevel = getProgress(currentDifficulty);
             newGame();
         }
