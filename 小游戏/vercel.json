@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "functions": {
+    "api/shang-xirui.js": {
+      "maxDuration": 60
+    },
+    "api/health.js": {
+      "maxDuration": 10
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/shang-xirui",
+      "dest": "/api/shang-xirui.js"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.js"
+    }
+  ]
+}
