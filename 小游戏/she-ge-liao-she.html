@@ -141,9 +141,11 @@
 
         .map-container {
             width: 100%;
-            max-width: 400px;
-            height: 100%;
+            max-width: 420px;
+            height: 320px;
             position: relative;
+            background: rgba(41, 25, 67, 0.2);
+            border-radius: 8px;
         }
 
         /* 层级 - 三层堆叠，有偏移产生层叠感 */
@@ -153,35 +155,35 @@
             gap: 2px;
         }
 
-        /* 各层位置不同，产生偏移 */
-        /* 最底层 */
+        /* 格子固定 60x60 */
         .layer-3 {
             z-index: 1;
-            top: 0; left: 0;
-            width: calc(100% - 0px);
-            height: 100%;
+            top: 5px; left: 5px;
+            /* 5行×7列 = 35个格子 */
+            grid-template-columns: repeat(7, 60px);
+            grid-template-rows: repeat(5, 60px);
         }
 
-        /* 中间层 - 向右下偏移 */
         .layer-2 {
             z-index: 2;
-            top: 15%; left: 10%;
-            width: calc(100% - 10px);
-            height: calc(100% - 15%);
+            top: 15px; left: 25px;
+            /* 4行×5列 = 20个格子 */
+            grid-template-columns: repeat(7, 60px);
+            grid-template-rows: repeat(5, 60px);
         }
 
-        /* 最顶层 - 继续向右下偏移 */
         .layer-1 {
             z-index: 3;
-            top: 30%; left: 20%;
-            width: calc(100% - 20px);
-            height: calc(100% - 30%);
+            top: 25px; left: 45px;
+            /* 3行×3列 = 9个格子 */
+            grid-template-columns: repeat(7, 60px);
+            grid-template-rows: repeat(5, 60px);
         }
 
         /* 格子 */
         .tile-slot {
-            width: 100%;
-            height: 100%;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -190,29 +192,24 @@
 
         /* 图标 */
         .tile {
-            width: 100%;
-            height: 100%;
-            border-radius: 4px;
+            width: 56px;
+            height: 56px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.1s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* 中层格子稍大 */
-        .layer-2 .tile {
-            width: 95%;
-            height: 95%;
+        .tile:active { transform: scale(0.95); }
+        .tile.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
-
-        /* 顶层格子最大 */
-        .layer-1 .tile {
-            width: 90%;
-            height: 90%;
-        }
+        .tile.disabled:active { transform: none; }
 
         .tile:active { transform: scale(0.95); }
         .tile.disabled {
@@ -838,13 +835,12 @@
                     var colDiff = Math.abs(other.col - card.col);
 
                     // 覆盖判定：同一位置或相邻位置
-                    // 根据规则，上层会覆盖下层边缘，露出中心
-                    if (rowDiff <= 0 && colDiff <= 0) {
+                    if (rowDiff === 0 && colDiff === 0) {
                         // 完全覆盖
                         card.blocked = true;
                         break;
                     } else if (rowDiff <= 1 && colDiff <= 1) {
-                        // 错开覆盖（覆盖面积 > 30%）
+                        // 错开覆盖
                         card.blocked = true;
                         break;
                     }
