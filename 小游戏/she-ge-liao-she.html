@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>杀了个杀</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #DCDDF6 0%, #c8c6e8 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            max-height: 750px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: linear-gradient(180deg, #9B8BA7 0%, #8B77B9 50%, #7a6a9a 100%);
+            overflow: hidden;
+        }
+
+        /* 主界面 */
+        .main-menu {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .menu-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(90, 74, 122, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .menu-btn {
+            width: 200px;
+            height: 50px;
+            background: #905F9D;
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(144, 95, 157, 0.4);
+        }
+
+        .menu-btn:hover {
+            background: #a97ab5;
+            transform: translateY(-2px);
+        }
+
+        .menu-btn:active {
+            transform: translateY(0);
+        }
+
+        .menu-btn-primary {
+            background: #6b5b95;
+            width: 220px;
+            height: 60px;
+            font-size: 22px;
+        }
+
+        /* 游戏界面 */
+        .game-screen {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            padding: 10px;
+            position: relative;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            color: #fff;
+        }
+
+        .game-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .header-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-btn:active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* 图标区域 */
+        .tile-area {
+            flex: 1;
+            position: relative;
+            margin: 10px 5px;
+            background: rgba(41, 25, 67, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .tile-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            padding: 10px;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .tile-cell {
+            aspect-ratio: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tile {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: absolute;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .tile:active {
+            transform: scale(0.95);
+        }
+
+        .tile.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .tile.covered {
+            opacity: 0.3;
+        }
+
+        /* 图标类型 */
+        .tile-red { background: linear-gradient(135deg, #ff6b6b, #ee5a5a); }
+        .tile-black { background: linear-gradient(135deg, #4a4a4a, #333); }
+        .tile-blue { background: linear-gradient(135deg, #4dabf7, #339af0); }
+        .tile-green { background: linear-gradient(135deg, #69db7c, #51cf66); }
+
+        /* 收集区域 */
+        .collect-area {
+            padding: 10px;
+            background: rgba(41, 25, 67, 0.5);
+            border-radius: 10px;
+            margin: 5px;
+        }
+
+        .collect-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .collect-cell {
+            aspect-ratio: 1;
+            background: rgba(201, 183, 226, 0.3);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .collect-cell .tile {
+            width: 90%;
+            height: 90%;
+            animation: tileAppear 0.2s ease-out;
+        }
+
+        @keyframes tileAppear {
+            0% { transform: scale(0) rotate(-10deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        @keyframes tileEliminate {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .tile.eliminating {
+            animation: tileEliminate 0.3s ease-out forwards;
+        }
+
+        /* 底部按钮 */
+        .game-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        .prop-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #905F9D;
+            border: none;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .prop-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .prop-btn .icon {
+            font-size: 18px;
+        }
+
+        .prop-btn .count {
+            background: #fff;
+            color: #905F9D;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .give-up-btn {
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* 弹窗 */
+        .modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(41, 25, 67, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 320px;
+            width: 90%;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #5a4a7a;
+            margin-bottom: 20px;
+        }
+
+        .modal-title.win {
+            color: #6b5b95;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            color: #5a4a7a;
+            margin-bottom: 10px;
+        }
+
+        .modal-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .modal-btn-primary {
+            background: #905F9D;
+            color: #fff;
+        }
+
+        .modal-btn-secondary {
+            background: rgba(144, 95, 157, 0.2);
+            color: #905F9D;
+        }
+
+        /* 设置弹窗 */
+        .settings-content {
+            text-align: left;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .toggle {
+            width: 50px;
+            height: 28px;
+            background: #ccc;
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle.active {
+            background: #905F9D;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.2s;
+        }
+
+        .toggle.active::after {
+            left: 24px;
+        }
+
+        .close-modal {
+            margin-top: 20px;
+            padding: 10px 30px;
+        }
+
+        /* 统计信息 */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 10px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #905F9D;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* 手机适配 */
+        @media (max-width: 400px) {
+            .menu-title {
+                font-size: 28px;
+            }
+            .tile {
+                font-size: 22px;
+            }
+            .tile-grid {
+                max-width: 320px;
+                gap: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 主界面 -->
+        <div class="main-menu" id="mainMenu">
+            <div class="menu-title">杀了个杀</div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalGames">0</div>
+                    <div class="stat-label">已挑战</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalWins">0</div>
+                    <div class="stat-label">已通关</div>
+                </div>
+            </div>
+            <button class="menu-btn menu-btn-primary" id="btnStart">开始游戏</button>
+            <button class="menu-btn" id="btnSettings">设置</button>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div class="game-screen" id="gameScreen">
+            <div class="game-header">
+                <div class="game-title">每日一关</div>
+                <div class="header-btns">
+                    <button class="header-btn" id="btnBack">←</button>
+                    <button class="header-btn" id="btnGameSettings">⚙</button>
+                </div>
+            </div>
+
+            <div class="tile-area">
+                <div class="tile-grid" id="tileGrid"></div>
+            </div>
+
+            <div class="collect-area">
+                <div class="collect-grid" id="collectGrid"></div>
+            </div>
+
+            <div class="game-footer">
+                <button class="prop-btn" id="btnProp">
+                    <span class="icon">🧹</span>
+                    <span>移出</span>
+                    <span class="count" id="propCount">1</span>
+                </button>
+                <button class="give-up-btn" id="btnGiveUp">放弃挑战</button>
+            </div>
+        </div>
+
+        <!-- 胜利弹窗 -->
+        <div class="modal" id="winModal">
+            <div class="modal-content">
+                <div class="modal-title win">🎉 恭喜通关！</div>
+                <div class="modal-text" id="winTime">用时：00:00</div>
+                <div class="modal-btns">
+                    <button class="modal-btn modal-btn-primary" id="btnWinRestart">再来一局</button>
+                    <button class="modal-btn modal-btn-secondary" id="btnWinMenu">返回主页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 失败弹窗 -->
+        <div class="modal" id="failModal">
+            <div class="modal-content">
+                <div class="modal-title">😢 再接再厉</div>
+                <div class="modal-text">格子已满，无法继续</div>
+                <div class="modal-btns">
+                    <button class="modal-btn modal-btn-primary" id="btnFailRestart">再来一局</button>
+                    <button class="modal-btn modal-btn-secondary" id="btnFailMenu">返回主页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 设置弹窗 -->
+        <div class="modal" id="settingsModal">
+            <div class="modal-content settings-content">
+                <div class="modal-title">设置</div>
+                <div class="setting-item">
+                    <span>音效</span>
+                    <div class="toggle active" id="toggleSound"></div>
+                </div>
+                <button class="modal-btn modal-btn-secondary close-modal" id="btnCloseSettings">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        // ==================== 常量配置 ====================
+        var TILE_TYPES = ['red', 'black', 'blue', 'green'];
+        var GRID_COLS = 7;
+        var GRID_ROWS = 3;
+        var COLLECT_SIZE = 7;
+        var ELIMINATE_COUNT = 3;
+
+        // ==================== 游戏状态 ====================
+        var gameState = {
+            tiles: [],           // 所有图标 [{type, row, col, layer}]
+            collect: [],         // 收集区 [{type}]
+            propCount: 1,        // 道具数量
+            startTime: null,     // 开始时间
+            isPlaying: false,    // 是否在游戏中
+            soundEnabled: true   // 音效开关
+        };
+
+        // ==================== 本地存储 ====================
+        var SAVE_KEY = 'she-ge-liao-she-save';
+        var SETTINGS_KEY = 'she-ge-liao-she-settings';
+
+        // ==================== DOM 元素 ====================
+        var elements = {};
+
+        // ==================== 初始化 ====================
+        function init() {
+            cacheElements();
+            loadSettings();
+            loadStats();
+            bindEvents();
+        }
+
+        function cacheElements() {
+            elements = {
+                mainMenu: document.getElementById('mainMenu'),
+                gameScreen: document.getElementById('gameScreen'),
+                tileGrid: document.getElementById('tileGrid'),
+                collectGrid: document.getElementById('collectGrid'),
+                totalGames: document.getElementById('totalGames'),
+                totalWins: document.getElementById('totalWins'),
+                propCount: document.getElementById('propCount'),
+                btnStart: document.getElementById('btnStart'),
+                btnSettings: document.getElementById('btnSettings'),
+                btnBack: document.getElementById('btnBack'),
+                btnGameSettings: document.getElementById('btnGameSettings'),
+                btnProp: document.getElementById('btnProp'),
+                btnGiveUp: document.getElementById('btnGiveUp'),
+                btnWinRestart: document.getElementById('btnWinRestart'),
+                btnWinMenu: document.getElementById('btnWinMenu'),
+                btnFailRestart: document.getElementById('btnFailRestart'),
+                btnFailMenu: document.getElementById('btnFailMenu'),
+                btnCloseSettings: document.getElementById('btnCloseSettings'),
+                toggleSound: document.getElementById('toggleSound'),
+                winModal: document.getElementById('winModal'),
+                failModal: document.getElementById('failModal'),
+                settingsModal: document.getElementById('settingsModal'),
+                winTime: document.getElementById('winTime')
+            };
+        }
+
+        function bindEvents() {
+            // 主界面
+            elements.btnStart.addEventListener('click', startGame);
+            elements.btnSettings.addEventListener('click', showSettings);
+
+            // 游戏界面
+            elements.btnBack.addEventListener('click', backToMenu);
+            elements.btnGameSettings.addEventListener('click', showSettings);
+            elements.btnProp.addEventListener('click', useProp);
+            elements.btnGiveUp.addEventListener('click', giveUp);
+
+            // 结算弹窗
+            elements.btnWinRestart.addEventListener('click', restartGame);
+            elements.btnWinMenu.addEventListener('click', backToMenu);
+            elements.btnFailRestart.addEventListener('click', restartGame);
+            elements.btnFailMenu.addEventListener('click', backToMenu);
+
+            // 设置弹窗
+            elements.btnCloseSettings.addEventListener('click', hideSettings);
+            elements.toggleSound.addEventListener('click', toggleSound);
+
+            // 阻止触摸滑动导致页面刷新
+            document.addEventListener('touchmove', function(e) {
+                if (gameState.isPlaying) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        }
+
+        // ==================== 存储相关 ====================
+        function loadSettings() {
+            var settings = localStorage.getItem(SETTINGS_KEY);
+            if (settings) {
+                var data = JSON.parse(settings);
+                gameState.soundEnabled = data.soundEnabled !== false;
+            }
+            updateSoundToggle();
+        }
+
+        function saveSettings() {
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+                soundEnabled: gameState.soundEnabled
+            }));
+        }
+
+        function loadStats() {
+            var stats = localStorage.getItem(SAVE_KEY);
+            if (stats) {
+                var data = JSON.parse(stats);
+                elements.totalGames.textContent = data.totalGames || 0;
+                elements.totalWins.textContent = data.totalWins || 0;
+            }
+        }
+
+        function saveStats(win) {
+            var stats = localStorage.getItem(SAVE_KEY);
+            var data = stats ? JSON.parse(stats) : { totalGames: 0, totalWins: 0 };
+            data.totalGames = (data.totalGames || 0) + 1;
+            if (win) {
+                data.totalWins = (data.totalWins || 0) + 1;
+            }
+            localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+            elements.totalGames.textContent = data.totalGames;
+            elements.totalWins.textContent = data.totalWins;
+        }
+
+        // ==================== 音效 ====================
+        function playSound(type) {
+            if (!gameState.soundEnabled) return;
+
+            try {
+                var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                var oscillator = audioCtx.createOscillator();
+                var gainNode = audioCtx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                switch(type) {
+                    case 'click':
+                        oscillator.frequency.value = 440;
+                        gainNode.gain.value = 0.1;
+                        oscillator.start();
+                        oscillator.stop(audioCtx.currentTime + 0.05);
+                        break;
+                    case 'eliminate':
+                        oscillator.frequency.value = 880;
+                        gainNode.gain.value = 0.15;
+                        oscillator.start();
+                        oscillator.stop(audioCtx.currentTime + 0.15);
+                        break;
+                    case 'win':
+                        oscillator.frequency.value = 523;
+                        gainNode.gain.value = 0.2;
+                        oscillator.start();
+                        setTimeout(function() {
+                            oscillator.frequency.value = 659;
+                        }, 150);
+                        setTimeout(function() {
+                            oscillator.frequency.value = 784;
+                        }, 300);
+                        oscillator.stop(audioCtx.currentTime + 0.5);
+                        break;
+                    case 'fail':
+                        oscillator.frequency.value = 200;
+                        oscillator.type = 'sawtooth';
+                        gainNode.gain.value = 0.1;
+                        oscillator.start();
+                        oscillator.stop(audioCtx.currentTime + 0.3);
+                        break;
+                }
+            } catch(e) {}
+        }
+
+        function updateSoundToggle() {
+            if (gameState.soundEnabled) {
+                elements.toggleSound.classList.add('active');
+            } else {
+                elements.toggleSound.classList.remove('active');
+            }
+        }
+
+        function toggleSound() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            updateSoundToggle();
+            saveSettings();
+            if (gameState.soundEnabled) {
+                playSound('click');
+            }
+        }
+
+        // ==================== 界面切换 ====================
+        function showScreen(screen) {
+            elements.mainMenu.style.display = 'none';
+            elements.gameScreen.style.display = 'none';
+            elements.winModal.classList.remove('active');
+            elements.failModal.classList.remove('active');
+            elements.settingsModal.classList.remove('active');
+
+            if (screen === 'menu') {
+                elements.mainMenu.style.display = 'flex';
+            } else if (screen === 'game') {
+                elements.gameScreen.style.display = 'flex';
+            } else if (screen === 'win') {
+                elements.mainMenu.style.display = 'flex';
+                elements.winModal.classList.add('active');
+            } else if (screen === 'fail') {
+                elements.mainMenu.style.display = 'flex';
+                elements.failModal.classList.add('active');
+            }
+        }
+
+        function showSettings() {
+            elements.settingsModal.classList.add('active');
+        }
+
+        function hideSettings() {
+            elements.settingsModal.classList.remove('active');
+        }
+
+        // ==================== 游戏逻辑 ====================
+        function startGame() {
+            gameState.isPlaying = true;
+            gameState.propCount = 1;
+            gameState.collect = [];
+            gameState.startTime = Date.now();
+            elements.propCount.textContent = gameState.propCount;
+            elements.btnProp.disabled = false;
+
+            // 生成图标
+            generateTiles();
+            renderGame();
+            showScreen('game');
+            playSound('click');
+        }
+
+        function restartGame() {
+            hideSettings();
+            elements.winModal.classList.remove('active');
+            elements.failModal.classList.remove('active');
+            startGame();
+        }
+
+        function backToMenu() {
+            gameState.isPlaying = false;
+            showScreen('menu');
+            loadStats();
+            playSound('click');
+        }
+
+        function giveUp() {
+            gameState.isPlaying = false;
+            saveStats(false);
+            showScreen('fail');
+            playSound('fail');
+        }
+
+        function generateTiles() {
+            gameState.tiles = [];
+
+            // 每种图标需要出现 3 的倍数次，确保可以消除
+            var tileCount = GRID_COLS * GRID_ROWS;
+            var types = [];
+
+            // 生成足够的图标（每种至少3个，且是3的倍数）
+            for (var i = 0; i < tileCount; i++) {
+                types.push(TILE_TYPES[i % TILE_TYPES.length]);
+            }
+
+            // 打乱顺序
+            for (var i = types.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = types[i];
+                types[i] = types[j];
+                types[j] = temp;
+            }
+
+            // 创建图标对象
+            var index = 0;
+            for (var row = 0; row < GRID_ROWS; row++) {
+                for (var col = 0; col < GRID_COLS; col++) {
+                    gameState.tiles.push({
+                        id: index,
+                        type: types[index],
+                        row: row,
+                        col: col,
+                        layer: 0
+                    });
+                    index++;
+                }
+            }
+        }
+
+        function renderGame() {
+            renderTileGrid();
+            renderCollectGrid();
+        }
+
+        function renderTileGrid() {
+            elements.tileGrid.innerHTML = '';
+
+            // 创建格子
+            for (var row = 0; row < GRID_ROWS; row++) {
+                for (var col = 0; col < GRID_COLS; col++) {
+                    var cell = document.createElement('div');
+                    cell.className = 'tile-cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    elements.tileGrid.appendChild(cell);
+                }
+            }
+
+            // 渲染图标
+            gameState.tiles.forEach(function(tile) {
+                if (tile.type) {
+                    var tileEl = document.createElement('div');
+                    tileEl.className = 'tile tile-' + tile.type;
+                    tileEl.dataset.id = tile.id;
+
+                    // 位置计算
+                    var cellSize = 100 / GRID_COLS;
+                    var offsetX = (Math.random() * 6 - 3) + '%';
+                    var offsetY = (Math.random() * 6 - 3) + '%';
+
+                    tileEl.style.left = tile.col * cellSize + '%';
+                    tileEl.style.top = tile.row * (100 / GRID_ROWS) + '%';
+                    tileEl.style.width = cellSize + '%';
+                    tileEl.style.height = (100 / GRID_ROWS) + '%';
+
+                    // 检测是否可点击
+                    if (!isTileClickable(tile)) {
+                        tileEl.classList.add('disabled');
+                    } else {
+                        tileEl.addEventListener('click', (function(t) {
+                            return function() {
+                                clickTile(t);
+                            };
+                        })(tile));
+                    }
+
+                    // 插入到对应格子
+                    var cells = elements.tileGrid.querySelectorAll('.tile-cell');
+                    var cellIndex = tile.row * GRID_COLS + tile.col;
+                    if (cells[cellIndex]) {
+                        cells[cellIndex].appendChild(tileEl);
+                    }
+                }
+            });
+        }
+
+        function renderCollectGrid() {
+            elements.collectGrid.innerHTML = '';
+
+            for (var i = 0; i < COLLECT_SIZE; i++) {
+                var cell = document.createElement('div');
+                cell.className = 'collect-cell';
+
+                if (gameState.collect[i]) {
+                    var tile = document.createElement('div');
+                    tile.className = 'tile tile-' + gameState.collect[i].type;
+                    tile.dataset.index = i;
+                    cell.appendChild(tile);
+                }
+
+                elements.collectGrid.appendChild(cell);
+            }
+        }
+
+        function isTileClickable(tile) {
+            // 检查是否有其他图标遮挡
+            return !gameState.tiles.some(function(t) {
+                if (!t || t.id === tile.id) return false;
+                // 检查是否在同一位置的上层
+                if (t.row === tile.row && t.col === tile.col && t.layer > tile.layer) {
+                    return true;
+                }
+                // 检查错开式遮挡（相邻格）
+                if (t.layer > tile.layer) {
+                    var rowDiff = Math.abs(t.row - tile.row);
+                    var colDiff = Math.abs(t.col - tile.col);
+                    if (rowDiff <= 1 && colDiff <= 1) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
+
+        function clickTile(tile) {
+            if (!gameState.isPlaying) return;
+            if (gameState.collect.length >= COLLECT_SIZE) return;
+
+            playSound('click');
+
+            // 移除图标
+            tile.type = null;
+
+            // 添加到收集区
+            gameState.collect.push({ type: tile.type === null ? tile.type : null });
+            // 修正：应该保存图标的 type
+            var clickedType = tile.type;
+            gameState.collect.pop();
+            gameState.collect.push({ type: clickedType });
+
+            renderGame();
+
+            // 检查消除
+            setTimeout(function() {
+                checkEliminate();
+            }, 100);
+        }
+
+        function checkEliminate() {
+            // 统计每种类型的数量
+            var typeCount = {};
+            gameState.collect.forEach(function(item) {
+                if (item) {
+                    typeCount[item.type] = (typeCount[item.type] || 0) + 1;
+                }
+            });
+
+            // 找出可以消除的类型
+            var toEliminate = [];
+            for (var type in typeCount) {
+                if (typeCount[type] >= ELIMINATE_COUNT) {
+                    toEliminate.push(type);
+                }
+            }
+
+            if (toEliminate.length > 0) {
+                // 消除
+                var eliminated = 0;
+                var indexesToRemove = [];
+
+                for (var i = 0; i < gameState.collect.length && eliminated < ELIMINATE_COUNT; i++) {
+                    if (toEliminate.includes(gameState.collect[i].type)) {
+                        indexesToRemove.push(i);
+                        eliminated++;
+                    }
+                }
+
+                // 添加消除动画
+                indexesToRemove.forEach(function(index) {
+                    var cell = elements.collectGrid.children[index];
+                    var tile = cell.querySelector('.tile');
+                    if (tile) {
+                        tile.classList.add('eliminating');
+                    }
+                });
+
+                playSound('eliminate');
+
+                // 延迟移除
+                setTimeout(function() {
+                    // 从后往前移除
+                    indexesToRemove.reverse().forEach(function(index) {
+                        gameState.collect.splice(index, 1);
+                    });
+                    renderCollectGrid();
+
+                    // 再次检查
+                    setTimeout(function() {
+                        checkEliminate();
+                        checkWin();
+                    }, 100);
+                }, 300);
+            } else {
+                // 检查失败
+                checkFail();
+            }
+        }
+
+        function checkWin() {
+            // 所有图标都被消除
+            var remaining = gameState.tiles.filter(function(t) { return t.type !== null; });
+            if (remaining.length === 0) {
+                gameState.isPlaying = false;
+                saveStats(true);
+
+                var elapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
+                var minutes = Math.floor(elapsed / 60);
+                var seconds = elapsed % 60;
+                elements.winTime.textContent = '用时：' +
+                    (minutes < 10 ? '0' : '') + minutes + ':' +
+                    (seconds < 10 ? '0' : '') + seconds;
+
+                showScreen('win');
+                playSound('win');
+            }
+        }
+
+        function checkFail() {
+            // 收集区满了
+            if (gameState.collect.length >= COLLECT_SIZE) {
+                // 检查是否还能消除
+                var typeCount = {};
+                gameState.collect.forEach(function(item) {
+                    if (item) {
+                        typeCount[item.type] = (typeCount[item.type] || 0) + 1;
+                    }
+                });
+
+                var canEliminate = Object.values(typeCount).some(function(count) {
+                    return count >= ELIMINATE_COUNT;
+                });
+
+                if (!canEliminate) {
+                    gameState.isPlaying = false;
+                    saveStats(false);
+                    showScreen('fail');
+                    playSound('fail');
+                }
+            }
+        }
+
+        function useProp() {
+            if (!gameState.isPlaying) return;
+            if (gameState.propCount <= 0) return;
+            if (gameState.collect.length < 3) return;
+
+            playSound('click');
+
+            gameState.propCount--;
+            elements.propCount.textContent = gameState.propCount;
+            if (gameState.propCount <= 0) {
+                elements.btnProp.disabled = true;
+            }
+
+            // 移除最左边的3个
+            var removed = 0;
+            var indexesToRemove = [];
+
+            for (var i = 0; i < gameState.collect.length && removed < 3; i++) {
+                if (gameState.collect[i]) {
+                    indexesToRemove.push(i);
+                    removed++;
+                }
+            }
+
+            // 添加动画
+            indexesToRemove.forEach(function(index) {
+                var cell = elements.collectGrid.children[index];
+                var tile = cell.querySelector('.tile');
+                if (tile) {
+                    tile.classList.add('eliminating');
+                }
+            });
+
+            setTimeout(function() {
+                indexesToRemove.reverse().forEach(function(index) {
+                    gameState.collect.splice(index, 1);
+                });
+                renderCollectGrid();
+                checkWin();
+            }, 300);
+        }
+
+        // ==================== 启动 ====================
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+</body>
+</html>
