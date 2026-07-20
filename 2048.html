@@ -350,6 +350,10 @@
         var touchStartX = 0;
         var touchStartY = 0;
 
+        // 本地存储键名
+        var SAVE_KEY = 'dazheng-e-2048-save';
+        var BEST_KEY = 'dazheng-e-2048-best';
+
         var tilesContainer, scoreEl, bestEl, overlay, overlayTitle, overlaySubtitle;
 
         function init() {
@@ -360,28 +364,41 @@
             overlayTitle = document.getElementById('overlay-title');
             overlaySubtitle = document.getElementById('overlay-subtitle');
 
-            best = parseInt(localStorage.getItem('2048-best') || '0');
+            best = parseInt(localStorage.getItem(BEST_KEY) || '0');
             bestEl.textContent = best;
 
-            grid = [];
-            for (var r = 0; r < size; r++) {
-                grid[r] = [];
-                for (var c = 0; c < size; c++) {
-                    grid[r][c] = 0;
+            // 尝试加载保存的进度
+            var savedGame = loadGame();
+
+            if (savedGame) {
+                grid = savedGame.grid;
+                score = savedGame.score;
+                history = savedGame.history || [];
+                gameOver = savedGame.gameOver;
+                won = savedGame.won;
+                overlay.classList.remove('active');
+                updateScoreDisplay();
+                renderTiles();
+            } else {
+                // 没有保存的进度，开始新游戏
+                grid = [];
+                for (var r = 0; r < size; r++) {
+                    grid[r] = [];
+                    for (var c = 0; c < size; c++) {
+                        grid[r][c] = 0;
+                    }
                 }
+                score = 0;
+                history = [];
+                gameOver = false;
+                won = false;
+                overlay.classList.remove('active');
+                updateScoreDisplay();
+                addRandomTile();
+                addRandomTile();
+                renderTiles();
+                saveGame();
             }
-
-            score = 0;
-            history = [];
-            gameOver = false;
-            won = false;
-            overlay.classList.remove('active');
-
-            updateScoreDisplay();
-
-            addRandomTile();
-            addRandomTile();
-            renderTiles();
 
             document.getElementById('btn-new').addEventListener('click', restart);
             document.getElementById('btn-undo').addEventListener('click', undo);
@@ -391,7 +408,44 @@
             setupTouch();
         }
 
+        // 保存游戏进度
+        function saveGame() {
+            var saveData = {
+                grid: grid,
+                score: score,
+                history: history.slice(-4), // 只保存最近4步
+                gameOver: gameOver,
+                won: won,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+        }
+
+        // 加载游戏进度
+        function loadGame() {
+            var saved = localStorage.getItem(SAVE_KEY);
+            if (saved) {
+                try {
+                    var data = JSON.parse(saved);
+                    // 检查是否是有效的游戏数据
+                    if (data.grid && data.grid.length === size) {
+                        return data;
+                    }
+                } catch (e) {
+                    console.log('加载存档失败');
+                }
+            }
+            return null;
+        }
+
+        // 清除保存的进度
+        function clearSave() {
+            localStorage.removeItem(SAVE_KEY);
+        }
+
         function restart() {
+            clearSave(); // 清除旧存档
+
             grid = [];
             for (var r = 0; r < size; r++) {
                 grid[r] = [];
@@ -410,6 +464,7 @@
             addRandomTile();
             addRandomTile();
             renderTiles();
+            saveGame(); // 保存新游戏进度
         }
 
         function undo() {
@@ -420,6 +475,7 @@
                 gameOver = false;
                 renderTiles();
                 updateScoreDisplay();
+                saveGame(); // 撤销后保存
             }
         }
 
@@ -569,6 +625,7 @@
                     renderTiles(newTile, mergedPositions);
                     updateScoreDisplay();
                     checkGameState();
+                    saveGame(); // 自动保存进度
 
                     setTimeout(function() {
                         isAnimating = false;
@@ -677,7 +734,7 @@
 
             if (score > best) {
                 best = score;
-                localStorage.setItem('2048-best', best.toString());
+                localStorage.setItem(BEST_KEY, best.toString());
                 bestEl.textContent = best;
             }
         }
