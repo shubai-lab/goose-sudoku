@@ -13,10 +13,9 @@
 
         body {
             font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #DCDDF6 0%, #c8c6e8 100%);
+            background: #DCDDF6;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow: hidden;
@@ -25,15 +24,15 @@
             user-select: none;
         }
 
-        .container {
+        .game-container {
             width: 100%;
             max-width: 500px;
             height: 100vh;
             max-height: 750px;
+            background: linear-gradient(180deg, #9B8BA7 0%, #8B77B9 100%);
             display: flex;
             flex-direction: column;
             position: relative;
-            background: linear-gradient(180deg, #9B8BA7 0%, #8B77B9 50%, #7a6a9a 100%);
             overflow: hidden;
         }
 
@@ -45,45 +44,59 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            gap: 20px;
+            gap: 15px;
         }
 
         .menu-title {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 800;
             color: #fff;
             text-shadow: 2px 2px 4px rgba(90, 74, 122, 0.5);
-            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 40px;
+            margin: 10px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
         }
 
         .menu-btn {
             width: 200px;
             height: 50px;
-            background: #905F9D;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.4);
             color: #fff;
-            border: none;
             border-radius: 25px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(144, 95, 157, 0.4);
         }
 
         .menu-btn:hover {
-            background: #a97ab5;
-            transform: translateY(-2px);
-        }
-
-        .menu-btn:active {
-            transform: translateY(0);
+            background: rgba(255,255,255,0.3);
         }
 
         .menu-btn-primary {
-            background: #6b5b95;
+            background: #905F9D;
+            border: none;
             width: 220px;
-            height: 60px;
-            font-size: 22px;
+            height: 55px;
+            font-size: 18px;
         }
 
         /* 游戏界面 */
@@ -91,7 +104,6 @@
             display: none;
             flex-direction: column;
             flex: 1;
-            padding: 10px;
             position: relative;
         }
 
@@ -99,12 +111,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px 10px;
+            padding: 10px 15px;
             color: #fff;
         }
 
         .game-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
         }
 
@@ -114,46 +126,65 @@
         }
 
         .header-btn {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             background: rgba(255,255,255,0.2);
             border: none;
             border-radius: 50%;
             color: #fff;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        .header-btn:active {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* 图标区域 */
-        .tile-area {
+        /* 地图区域 - 纺锤形 */
+        .map-area {
             flex: 1;
-            position: relative;
-            margin: 10px 5px;
-            background: rgba(41, 25, 67, 0.3);
-            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            padding: 10px;
+            position: relative;
         }
 
-        .tile-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            padding: 10px;
+        .map-container {
             width: 100%;
             max-width: 380px;
+            height: 100%;
+            position: relative;
         }
 
-        .tile-cell {
+        /* 层级容器 */
+        .layer {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: grid;
+            gap: 3px;
+        }
+
+        /* 第3层 - 最底层（最多格子） */
+        .layer-3 {
+            bottom: 0;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+        }
+
+        /* 第2层 - 中间层 */
+        .layer-2 {
+            bottom: 20px;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+        }
+
+        /* 第1层 - 最上层（最少格子） */
+        .layer-1 {
+            bottom: 35px;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+        }
+
+        /* 格子 */
+        .tile-slot {
             aspect-ratio: 1;
             position: relative;
             display: flex;
@@ -161,18 +192,19 @@
             justify-content: center;
         }
 
+        /* 图标 */
         .tile {
-            width: 100%;
-            height: 100%;
-            border-radius: 8px;
+            width: 90%;
+            height: 90%;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 20px;
             cursor: pointer;
             transition: all 0.15s ease;
             position: absolute;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
         .tile:active {
@@ -180,12 +212,12 @@
         }
 
         .tile.disabled {
-            opacity: 0.4;
+            opacity: 0.35;
             cursor: not-allowed;
         }
 
-        .tile.covered {
-            opacity: 0.3;
+        .tile.disabled:active {
+            transform: none;
         }
 
         /* 图标类型 */
@@ -193,22 +225,24 @@
         .tile-black { background: linear-gradient(135deg, #4a4a4a, #333); }
         .tile-blue { background: linear-gradient(135deg, #4dabf7, #339af0); }
         .tile-green { background: linear-gradient(135deg, #69db7c, #51cf66); }
+        .tile-yellow { background: linear-gradient(135deg, #ffd43b, #fab005); }
+        .tile-purple { background: linear-gradient(135deg, #da77f2, #be4bdb); }
 
         /* 收集区域 */
         .collect-area {
-            padding: 10px;
-            background: rgba(41, 25, 67, 0.5);
-            border-radius: 10px;
-            margin: 5px;
+            padding: 10px 15px;
+            background: rgba(41, 25, 67, 0.4);
         }
 
         .collect-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 4px;
+            max-width: 380px;
+            margin: 0 auto;
         }
 
-        .collect-cell {
+        .collect-slot {
             aspect-ratio: 1;
             background: rgba(201, 183, 226, 0.3);
             border-radius: 6px;
@@ -217,9 +251,9 @@
             justify-content: center;
         }
 
-        .collect-cell .tile {
-            width: 90%;
-            height: 90%;
+        .collect-slot .tile {
+            width: 85%;
+            height: 85%;
             animation: tileAppear 0.2s ease-out;
         }
 
@@ -230,7 +264,7 @@
 
         @keyframes tileEliminate {
             0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); }
+            50% { transform: scale(1.3); }
             100% { transform: scale(0); opacity: 0; }
         }
 
@@ -242,48 +276,46 @@
         .game-footer {
             display: flex;
             justify-content: space-between;
-            padding: 10px;
+            padding: 10px 15px;
+            padding-bottom: 20px;
         }
 
         .prop-btn {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
+            gap: 6px;
+            padding: 10px 14px;
             background: #905F9D;
             border: none;
             border-radius: 20px;
             color: #fff;
-            font-size: 14px;
-            cursor: pointer;
+            font-size: 13px;
         }
 
         .prop-btn:disabled {
             opacity: 0.5;
-            cursor: not-allowed;
         }
 
         .prop-btn .icon {
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .prop-btn .count {
             background: #fff;
             color: #905F9D;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 10px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
         }
 
         .give-up-btn {
-            padding: 10px 16px;
-            background: rgba(255,255,255,0.2);
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.15);
             border: none;
             border-radius: 20px;
             color: #fff;
-            font-size: 14px;
-            cursor: pointer;
+            font-size: 13px;
         }
 
         /* 弹窗 */
@@ -293,7 +325,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(41, 25, 67, 0.9);
+            background: rgba(41, 25, 67, 0.92);
             display: none;
             flex-direction: column;
             align-items: center;
@@ -307,28 +339,28 @@
 
         .modal-content {
             background: #fff;
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 16px;
+            padding: 25px;
             text-align: center;
-            max-width: 320px;
+            max-width: 280px;
             width: 90%;
         }
 
         .modal-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 800;
             color: #5a4a7a;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .modal-title.win {
-            color: #6b5b95;
+            color: #905F9D;
         }
 
         .modal-text {
-            font-size: 16px;
-            color: #5a4a7a;
-            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
         }
 
         .modal-btns {
@@ -339,10 +371,10 @@
         }
 
         .modal-btn {
-            padding: 12px 24px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 25px;
-            font-size: 16px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
         }
@@ -353,7 +385,7 @@
         }
 
         .modal-btn-secondary {
-            background: rgba(144, 95, 157, 0.2);
+            background: rgba(144, 95, 157, 0.15);
             color: #905F9D;
         }
 
@@ -366,22 +398,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #eee;
         }
 
-        .setting-item:last-child {
+        .setting-item:last-of-type {
             border-bottom: none;
         }
 
         .toggle {
-            width: 50px;
-            height: 28px;
+            width: 44px;
+            height: 24px;
             background: #ccc;
-            border-radius: 14px;
+            border-radius: 12px;
             position: relative;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         .toggle.active {
@@ -391,8 +422,8 @@
         .toggle::after {
             content: '';
             position: absolute;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             background: #fff;
             border-radius: 50%;
             top: 2px;
@@ -401,54 +432,27 @@
         }
 
         .toggle.active::after {
-            left: 24px;
+            left: 22px;
         }
 
         .close-modal {
-            margin-top: 20px;
-            padding: 10px 30px;
-        }
-
-        /* 统计信息 */
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin: 10px 0;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #905F9D;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #888;
+            margin-top: 15px;
+            padding: 10px;
         }
 
         /* 手机适配 */
         @media (max-width: 400px) {
-            .menu-title {
-                font-size: 28px;
-            }
             .tile {
-                font-size: 22px;
+                font-size: 16px;
             }
-            .tile-grid {
-                max-width: 320px;
-                gap: 3px;
+            .menu-title {
+                font-size: 26px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="game-container">
         <!-- 主界面 -->
         <div class="main-menu" id="mainMenu">
             <div class="menu-title">杀了个杀</div>
@@ -476,8 +480,15 @@
                 </div>
             </div>
 
-            <div class="tile-area">
-                <div class="tile-grid" id="tileGrid"></div>
+            <div class="map-area">
+                <div class="map-container" id="mapContainer">
+                    <!-- 第3层 - 最底层 -->
+                    <div class="layer layer-3" id="layer3"></div>
+                    <!-- 第2层 - 中间层 -->
+                    <div class="layer layer-2" id="layer2"></div>
+                    <!-- 第1层 - 最上层 -->
+                    <div class="layer layer-1" id="layer1"></div>
+                </div>
             </div>
 
             <div class="collect-area">
@@ -535,29 +546,30 @@
     (function() {
         'use strict';
 
-        // ==================== 常量配置 ====================
-        var TILE_TYPES = ['red', 'black', 'blue', 'green'];
-        var GRID_COLS = 7;
-        var GRID_ROWS = 3;
+        // ==================== 配置 ====================
+        var TILE_TYPES = ['red', 'black', 'blue', 'green', 'yellow', 'purple'];
         var COLLECT_SIZE = 7;
         var ELIMINATE_COUNT = 3;
 
+        // 层级配置 - 纺锤形设计
+        var LAYERS = [
+            { id: 3, rows: 5, cols: 7, bottom: 0 },    // 最底层 - 最多格子
+            { id: 2, rows: 4, cols: 7, bottom: 20 },   // 中间层
+            { id: 1, rows: 3, cols: 7, bottom: 35 }    // 最上层 - 最少格子
+        ];
+
         // ==================== 游戏状态 ====================
-        var gameState = {
-            tiles: [],           // 所有图标 [{type, row, col, layer}]
+        var state = {
+            tiles: [],           // 所有图标 [{id, type, layer, row, col}]
             collect: [],         // 收集区 [{type}]
-            propCount: 1,        // 道具数量
-            startTime: null,     // 开始时间
-            isPlaying: false,    // 是否在游戏中
-            soundEnabled: true   // 音效开关
+            propCount: 1,
+            startTime: null,
+            isPlaying: false,
+            soundEnabled: true
         };
 
-        // ==================== 本地存储 ====================
-        var SAVE_KEY = 'she-ge-liao-she-save';
-        var SETTINGS_KEY = 'she-ge-liao-she-settings';
-
-        // ==================== DOM 元素 ====================
-        var elements = {};
+        // ==================== DOM 缓存 ====================
+        var $ = {};
 
         // ==================== 初始化 ====================
         function init() {
@@ -568,203 +580,168 @@
         }
 
         function cacheElements() {
-            elements = {
-                mainMenu: document.getElementById('mainMenu'),
-                gameScreen: document.getElementById('gameScreen'),
-                tileGrid: document.getElementById('tileGrid'),
-                collectGrid: document.getElementById('collectGrid'),
-                totalGames: document.getElementById('totalGames'),
-                totalWins: document.getElementById('totalWins'),
-                propCount: document.getElementById('propCount'),
-                btnStart: document.getElementById('btnStart'),
-                btnSettings: document.getElementById('btnSettings'),
-                btnBack: document.getElementById('btnBack'),
-                btnGameSettings: document.getElementById('btnGameSettings'),
-                btnProp: document.getElementById('btnProp'),
-                btnGiveUp: document.getElementById('btnGiveUp'),
-                btnWinRestart: document.getElementById('btnWinRestart'),
-                btnWinMenu: document.getElementById('btnWinMenu'),
-                btnFailRestart: document.getElementById('btnFailRestart'),
-                btnFailMenu: document.getElementById('btnFailMenu'),
-                btnCloseSettings: document.getElementById('btnCloseSettings'),
-                toggleSound: document.getElementById('toggleSound'),
-                winModal: document.getElementById('winModal'),
-                failModal: document.getElementById('failModal'),
-                settingsModal: document.getElementById('settingsModal'),
-                winTime: document.getElementById('winTime')
-            };
+            $.mainMenu = document.getElementById('mainMenu');
+            $.gameScreen = document.getElementById('gameScreen');
+            $.mapContainer = document.getElementById('mapContainer');
+            $.layer1 = document.getElementById('layer1');
+            $.layer2 = document.getElementById('layer2');
+            $.layer3 = document.getElementById('layer3');
+            $.collectGrid = document.getElementById('collectGrid');
+            $.totalGames = document.getElementById('totalGames');
+            $.totalWins = document.getElementById('totalWins');
+            $.propCount = document.getElementById('propCount');
+            $.btnProp = document.getElementById('btnProp');
+            $.btnBack = document.getElementById('btnBack');
+            $.btnGameSettings = document.getElementById('btnGameSettings');
+            $.btnGiveUp = document.getElementById('btnGiveUp');
+            $.btnWinRestart = document.getElementById('btnWinRestart');
+            $.btnWinMenu = document.getElementById('btnWinMenu');
+            $.btnFailRestart = document.getElementById('btnFailRestart');
+            $.btnFailMenu = document.getElementById('btnFailMenu');
+            $.btnCloseSettings = document.getElementById('btnCloseSettings');
+            $.toggleSound = document.getElementById('toggleSound');
+            $.winModal = document.getElementById('winModal');
+            $.failModal = document.getElementById('failModal');
+            $.settingsModal = document.getElementById('settingsModal');
+            $.winTime = document.getElementById('winTime');
         }
 
         function bindEvents() {
-            // 主界面
-            elements.btnStart.addEventListener('click', startGame);
-            elements.btnSettings.addEventListener('click', showSettings);
+            document.getElementById('btnStart').addEventListener('click', startGame);
+            document.getElementById('btnSettings').addEventListener('click', showSettings);
+            $.btnBack.addEventListener('click', backToMenu);
+            $.btnGameSettings.addEventListener('click', showSettings);
+            $.btnProp.addEventListener('click', useProp);
+            $.btnGiveUp.addEventListener('click', giveUp);
+            $.btnWinRestart.addEventListener('click', restartGame);
+            $.btnWinMenu.addEventListener('click', backToMenu);
+            $.btnFailRestart.addEventListener('click', restartGame);
+            $.btnFailMenu.addEventListener('click', backToMenu);
+            $.btnCloseSettings.addEventListener('click', hideSettings);
+            $.toggleSound.addEventListener('click', toggleSound);
 
-            // 游戏界面
-            elements.btnBack.addEventListener('click', backToMenu);
-            elements.btnGameSettings.addEventListener('click', showSettings);
-            elements.btnProp.addEventListener('click', useProp);
-            elements.btnGiveUp.addEventListener('click', giveUp);
-
-            // 结算弹窗
-            elements.btnWinRestart.addEventListener('click', restartGame);
-            elements.btnWinMenu.addEventListener('click', backToMenu);
-            elements.btnFailRestart.addEventListener('click', restartGame);
-            elements.btnFailMenu.addEventListener('click', backToMenu);
-
-            // 设置弹窗
-            elements.btnCloseSettings.addEventListener('click', hideSettings);
-            elements.toggleSound.addEventListener('click', toggleSound);
-
-            // 阻止触摸滑动导致页面刷新
             document.addEventListener('touchmove', function(e) {
-                if (gameState.isPlaying) {
-                    e.preventDefault();
-                }
+                if (state.isPlaying) e.preventDefault();
             }, { passive: false });
         }
 
-        // ==================== 存储相关 ====================
+        // ==================== 存储 ====================
         function loadSettings() {
-            var settings = localStorage.getItem(SETTINGS_KEY);
-            if (settings) {
-                var data = JSON.parse(settings);
-                gameState.soundEnabled = data.soundEnabled !== false;
+            var s = localStorage.getItem('shege-settings');
+            if (s) {
+                var data = JSON.parse(s);
+                state.soundEnabled = data.soundEnabled !== false;
             }
             updateSoundToggle();
         }
 
         function saveSettings() {
-            localStorage.setItem(SETTINGS_KEY, JSON.stringify({
-                soundEnabled: gameState.soundEnabled
+            localStorage.setItem('shege-settings', JSON.stringify({
+                soundEnabled: state.soundEnabled
             }));
         }
 
         function loadStats() {
-            var stats = localStorage.getItem(SAVE_KEY);
-            if (stats) {
-                var data = JSON.parse(stats);
-                elements.totalGames.textContent = data.totalGames || 0;
-                elements.totalWins.textContent = data.totalWins || 0;
+            var s = localStorage.getItem('shege-stats');
+            if (s) {
+                var data = JSON.parse(s);
+                $.totalGames.textContent = data.totalGames || 0;
+                $.totalWins.textContent = data.totalWins || 0;
             }
         }
 
         function saveStats(win) {
-            var stats = localStorage.getItem(SAVE_KEY);
-            var data = stats ? JSON.parse(stats) : { totalGames: 0, totalWins: 0 };
+            var data = { totalGames: 0, totalWins: 0 };
+            var s = localStorage.getItem('shege-stats');
+            if (s) data = JSON.parse(s);
             data.totalGames = (data.totalGames || 0) + 1;
-            if (win) {
-                data.totalWins = (data.totalWins || 0) + 1;
-            }
-            localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-            elements.totalGames.textContent = data.totalGames;
-            elements.totalWins.textContent = data.totalWins;
+            if (win) data.totalWins = (data.totalWins || 0) + 1;
+            localStorage.setItem('shege-stats', JSON.stringify(data));
+            $.totalGames.textContent = data.totalGames;
+            $.totalWins.textContent = data.totalWins;
         }
 
         // ==================== 音效 ====================
         function playSound(type) {
-            if (!gameState.soundEnabled) return;
-
+            if (!state.soundEnabled) return;
             try {
-                var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                var oscillator = audioCtx.createOscillator();
-                var gainNode = audioCtx.createGain();
-
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
+                var ctx = new (window.AudioContext || window.webkitAudioContext)();
+                var osc = ctx.createOscillator();
+                var gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                gain.gain.value = 0.1;
 
                 switch(type) {
-                    case 'click':
-                        oscillator.frequency.value = 440;
-                        gainNode.gain.value = 0.1;
-                        oscillator.start();
-                        oscillator.stop(audioCtx.currentTime + 0.05);
-                        break;
+                    case 'click': osc.frequency.value = 440; osc.start(); osc.stop(ctx.currentTime + 0.05); break;
                     case 'eliminate':
-                        oscillator.frequency.value = 880;
-                        gainNode.gain.value = 0.15;
-                        oscillator.start();
-                        oscillator.stop(audioCtx.currentTime + 0.15);
+                        osc.frequency.value = 660;
+                        gain.gain.value = 0.15;
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.15);
                         break;
                     case 'win':
-                        oscillator.frequency.value = 523;
-                        gainNode.gain.value = 0.2;
-                        oscillator.start();
-                        setTimeout(function() {
-                            oscillator.frequency.value = 659;
-                        }, 150);
-                        setTimeout(function() {
-                            oscillator.frequency.value = 784;
-                        }, 300);
-                        oscillator.stop(audioCtx.currentTime + 0.5);
-                        break;
+                        [523, 659, 784].forEach(function(f, i) {
+                            setTimeout(function() {
+                                var o = ctx.createOscillator();
+                                var g = ctx.createGain();
+                                o.connect(g);
+                                g.connect(ctx.destination);
+                                g.gain.value = 0.15;
+                                o.frequency.value = f;
+                                o.start();
+                                o.stop(ctx.currentTime + 0.15);
+                            }, i * 120);
+                        });
+                        return;
                     case 'fail':
-                        oscillator.frequency.value = 200;
-                        oscillator.type = 'sawtooth';
-                        gainNode.gain.value = 0.1;
-                        oscillator.start();
-                        oscillator.stop(audioCtx.currentTime + 0.3);
+                        osc.frequency.value = 200;
+                        osc.type = 'sawtooth';
+                        gain.gain.value = 0.1;
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.3);
                         break;
                 }
             } catch(e) {}
         }
 
         function updateSoundToggle() {
-            if (gameState.soundEnabled) {
-                elements.toggleSound.classList.add('active');
-            } else {
-                elements.toggleSound.classList.remove('active');
-            }
+            $.toggleSound.classList.toggle('active', state.soundEnabled);
         }
 
         function toggleSound() {
-            gameState.soundEnabled = !gameState.soundEnabled;
+            state.soundEnabled = !state.soundEnabled;
             updateSoundToggle();
             saveSettings();
-            if (gameState.soundEnabled) {
-                playSound('click');
-            }
+            if (state.soundEnabled) playSound('click');
         }
 
         // ==================== 界面切换 ====================
-        function showScreen(screen) {
-            elements.mainMenu.style.display = 'none';
-            elements.gameScreen.style.display = 'none';
-            elements.winModal.classList.remove('active');
-            elements.failModal.classList.remove('active');
-            elements.settingsModal.classList.remove('active');
+        function showScreen(name) {
+            $.mainMenu.style.display = 'none';
+            $.gameScreen.style.display = 'none';
+            $.winModal.classList.remove('active');
+            $.failModal.classList.remove('active');
+            $.settingsModal.classList.remove('active');
 
-            if (screen === 'menu') {
-                elements.mainMenu.style.display = 'flex';
-            } else if (screen === 'game') {
-                elements.gameScreen.style.display = 'flex';
-            } else if (screen === 'win') {
-                elements.mainMenu.style.display = 'flex';
-                elements.winModal.classList.add('active');
-            } else if (screen === 'fail') {
-                elements.mainMenu.style.display = 'flex';
-                elements.failModal.classList.add('active');
-            }
+            if (name === 'menu') $.mainMenu.style.display = 'flex';
+            else if (name === 'game') $.gameScreen.style.display = 'flex';
+            else if (name === 'win') { $.mainMenu.style.display = 'flex'; $.winModal.classList.add('active'); }
+            else if (name === 'fail') { $.mainMenu.style.display = 'flex'; $.failModal.classList.add('active'); }
         }
 
-        function showSettings() {
-            elements.settingsModal.classList.add('active');
-        }
-
-        function hideSettings() {
-            elements.settingsModal.classList.remove('active');
-        }
+        function showSettings() { $.settingsModal.classList.add('active'); }
+        function hideSettings() { $.settingsModal.classList.remove('active'); }
 
         // ==================== 游戏逻辑 ====================
         function startGame() {
-            gameState.isPlaying = true;
-            gameState.propCount = 1;
-            gameState.collect = [];
-            gameState.startTime = Date.now();
-            elements.propCount.textContent = gameState.propCount;
-            elements.btnProp.disabled = false;
+            state.isPlaying = true;
+            state.propCount = 1;
+            state.collect = [];
+            state.startTime = Date.now();
+            $.propCount.textContent = state.propCount;
+            $.btnProp.disabled = false;
 
-            // 生成图标
             generateTiles();
             renderGame();
             showScreen('game');
@@ -773,253 +750,235 @@
 
         function restartGame() {
             hideSettings();
-            elements.winModal.classList.remove('active');
-            elements.failModal.classList.remove('active');
+            $.winModal.classList.remove('active');
+            $.failModal.classList.remove('active');
             startGame();
         }
 
         function backToMenu() {
-            gameState.isPlaying = false;
+            state.isPlaying = false;
             showScreen('menu');
             loadStats();
             playSound('click');
         }
 
         function giveUp() {
-            gameState.isPlaying = false;
+            state.isPlaying = false;
             saveStats(false);
             showScreen('fail');
             playSound('fail');
         }
 
+        // 生成图标 - 确保每种类型数量是3的倍数
         function generateTiles() {
-            gameState.tiles = [];
+            state.tiles = [];
 
-            // 每种图标需要出现 3 的倍数次，确保可以消除
-            var tileCount = GRID_COLS * GRID_ROWS;
+            // 计算总格子数
+            var totalSlots = LAYERS.reduce(function(sum, l) { return sum + l.rows * l.cols; }, 0);
+
+            // 生成足够数量的图标类型
             var types = [];
-
-            // 生成足够的图标（每种至少3个，且是3的倍数）
-            for (var i = 0; i < tileCount; i++) {
-                types.push(TILE_TYPES[i % TILE_TYPES.length]);
+            var typeIndex = 0;
+            for (var i = 0; i < totalSlots; i++) {
+                types.push(TILE_TYPES[typeIndex % TILE_TYPES.length]);
+                typeIndex++;
             }
 
             // 打乱顺序
             for (var i = types.length - 1; i > 0; i--) {
                 var j = Math.floor(Math.random() * (i + 1));
-                var temp = types[i];
+                var tmp = types[i];
                 types[i] = types[j];
-                types[j] = temp;
+                types[j] = tmp;
             }
 
-            // 创建图标对象
+            // 分配到各层
             var index = 0;
-            for (var row = 0; row < GRID_ROWS; row++) {
-                for (var col = 0; col < GRID_COLS; col++) {
-                    gameState.tiles.push({
-                        id: index,
-                        type: types[index],
-                        row: row,
-                        col: col,
-                        layer: 0
-                    });
-                    index++;
+            LAYERS.forEach(function(layer) {
+                for (var row = 0; row < layer.rows; row++) {
+                    for (var col = 0; col < layer.cols; col++) {
+                        state.tiles.push({
+                            id: index,
+                            type: types[index],
+                            layer: layer.id,
+                            row: row,
+                            col: col
+                        });
+                        index++;
+                    }
                 }
-            }
+            });
         }
 
         function renderGame() {
-            renderTileGrid();
-            renderCollectGrid();
-        }
+            // 清空所有层
+            [$.layer1, $.layer2, $.layer3].forEach(function(el) { el.innerHTML = ''; });
+            $.collectGrid.innerHTML = '';
 
-        function renderTileGrid() {
-            elements.tileGrid.innerHTML = '';
-
-            // 创建格子
-            for (var row = 0; row < GRID_ROWS; row++) {
-                for (var col = 0; col < GRID_COLS; col++) {
-                    var cell = document.createElement('div');
-                    cell.className = 'tile-cell';
-                    cell.dataset.row = row;
-                    cell.dataset.col = col;
-                    elements.tileGrid.appendChild(cell);
-                }
+            // 渲染收集区格子
+            for (var i = 0; i < COLLECT_SIZE; i++) {
+                var slot = document.createElement('div');
+                slot.className = 'collect-slot';
+                $.collectGrid.appendChild(slot);
             }
 
-            // 渲染图标
-            gameState.tiles.forEach(function(tile) {
-                if (tile.type) {
+            // 按层渲染（第3层先渲染，第1层最后渲染）
+            var layerOrder = [3, 2, 1];
+            layerOrder.forEach(function(layerId) {
+                var layerEl = document.getElementById('layer' + layerId);
+                var layerConfig = LAYERS.find(function(l) { return l.id === layerId; });
+
+                for (var row = 0; row < layerConfig.rows; row++) {
+                    for (var col = 0; col < layerConfig.cols; col++) {
+                        var slot = document.createElement('div');
+                        slot.className = 'tile-slot';
+                        slot.dataset.layer = layerId;
+                        slot.dataset.row = row;
+                        slot.dataset.col = col;
+
+                        // 查找对应图标
+                        var tile = state.tiles.find(function(t) {
+                            return t.layer === layerId && t.row === row && t.col === col;
+                        });
+
+                        if (tile && tile.type) {
+                            var tileEl = document.createElement('div');
+                            tileEl.className = 'tile tile-' + tile.type;
+                            tileEl.dataset.id = tile.id;
+
+                            // 检测是否可点击
+                            if (!isTileClickable(tile)) {
+                                tileEl.classList.add('disabled');
+                            } else {
+                                tileEl.addEventListener('click', (function(t) {
+                                    return function() { clickTile(t); };
+                                })(tile));
+                            }
+
+                            slot.appendChild(tileEl);
+                        }
+
+                        layerEl.appendChild(slot);
+                    }
+                }
+            });
+
+            // 渲染收集区已有图标
+            state.collect.forEach(function(item, i) {
+                var slot = $.collectGrid.children[i];
+                if (slot && item) {
                     var tileEl = document.createElement('div');
-                    tileEl.className = 'tile tile-' + tile.type;
-                    tileEl.dataset.id = tile.id;
-
-                    // 位置计算
-                    var cellSize = 100 / GRID_COLS;
-                    var offsetX = (Math.random() * 6 - 3) + '%';
-                    var offsetY = (Math.random() * 6 - 3) + '%';
-
-                    tileEl.style.left = tile.col * cellSize + '%';
-                    tileEl.style.top = tile.row * (100 / GRID_ROWS) + '%';
-                    tileEl.style.width = cellSize + '%';
-                    tileEl.style.height = (100 / GRID_ROWS) + '%';
-
-                    // 检测是否可点击
-                    if (!isTileClickable(tile)) {
-                        tileEl.classList.add('disabled');
-                    } else {
-                        tileEl.addEventListener('click', (function(t) {
-                            return function() {
-                                clickTile(t);
-                            };
-                        })(tile));
-                    }
-
-                    // 插入到对应格子
-                    var cells = elements.tileGrid.querySelectorAll('.tile-cell');
-                    var cellIndex = tile.row * GRID_COLS + tile.col;
-                    if (cells[cellIndex]) {
-                        cells[cellIndex].appendChild(tileEl);
-                    }
+                    tileEl.className = 'tile tile-' + item.type;
+                    slot.appendChild(tileEl);
                 }
             });
         }
 
-        function renderCollectGrid() {
-            elements.collectGrid.innerHTML = '';
-
-            for (var i = 0; i < COLLECT_SIZE; i++) {
-                var cell = document.createElement('div');
-                cell.className = 'collect-cell';
-
-                if (gameState.collect[i]) {
-                    var tile = document.createElement('div');
-                    tile.className = 'tile tile-' + gameState.collect[i].type;
-                    tile.dataset.index = i;
-                    cell.appendChild(tile);
-                }
-
-                elements.collectGrid.appendChild(cell);
-            }
-        }
-
+        // 检测图标是否可点击（没有被遮挡）
         function isTileClickable(tile) {
-            // 检查是否有其他图标遮挡
-            return !gameState.tiles.some(function(t) {
-                if (!t || t.id === tile.id) return false;
-                // 检查是否在同一位置的上层
-                if (t.row === tile.row && t.col === tile.col && t.layer > tile.layer) {
-                    return true;
-                }
-                // 检查错开式遮挡（相邻格）
-                if (t.layer > tile.layer) {
+            // 从最上层往下检查
+            for (var l = tile.layer + 1; l <= 3; l++) {
+                var layerConfig = LAYERS.find(function(config) { return config.id === l; });
+                if (!layerConfig) continue;
+
+                // 检查是否有上层图标遮挡
+                var hasCover = state.tiles.some(function(t) {
+                    if (t.layer !== l || !t.type) return false;
+
+                    // 完全覆盖：同一行列
+                    if (t.row === tile.row && t.col === tile.col) return true;
+
+                    // 错开覆盖：相邻格（层内相邻也算遮挡）
                     var rowDiff = Math.abs(t.row - tile.row);
                     var colDiff = Math.abs(t.col - tile.col);
-                    if (rowDiff <= 1 && colDiff <= 1) {
-                        return true;
-                    }
-                }
-                return false;
-            });
+                    if (rowDiff <= 1 && colDiff <= 1) return true;
+
+                    return false;
+                });
+
+                if (hasCover) return false;
+            }
+            return true;
         }
 
         function clickTile(tile) {
-            if (!gameState.isPlaying) return;
-            if (gameState.collect.length >= COLLECT_SIZE) return;
+            if (!state.isPlaying) return;
+            if (state.collect.length >= COLLECT_SIZE) return;
 
             playSound('click');
 
-            // 移除图标
+            // 从数据中移除
             tile.type = null;
 
             // 添加到收集区
-            gameState.collect.push({ type: tile.type === null ? tile.type : null });
-            // 修正：应该保存图标的 type
+            state.collect.push({ type: tile.type === null ? tile.type : null });
             var clickedType = tile.type;
-            gameState.collect.pop();
-            gameState.collect.push({ type: clickedType });
+            state.collect.pop();
+            state.collect.push({ type: clickedType });
 
             renderGame();
 
             // 检查消除
-            setTimeout(function() {
-                checkEliminate();
-            }, 100);
+            setTimeout(checkEliminate, 150);
         }
 
         function checkEliminate() {
-            // 统计每种类型的数量
             var typeCount = {};
-            gameState.collect.forEach(function(item) {
+            state.collect.forEach(function(item) {
                 if (item) {
                     typeCount[item.type] = (typeCount[item.type] || 0) + 1;
                 }
             });
 
-            // 找出可以消除的类型
-            var toEliminate = [];
-            for (var type in typeCount) {
-                if (typeCount[type] >= ELIMINATE_COUNT) {
-                    toEliminate.push(type);
-                }
-            }
+            var canEliminate = Object.keys(typeCount).filter(function(type) {
+                return typeCount[type] >= ELIMINATE_COUNT;
+            });
 
-            if (toEliminate.length > 0) {
-                // 消除
+            if (canEliminate.length > 0) {
                 var eliminated = 0;
-                var indexesToRemove = [];
+                var indexes = [];
 
-                for (var i = 0; i < gameState.collect.length && eliminated < ELIMINATE_COUNT; i++) {
-                    if (toEliminate.includes(gameState.collect[i].type)) {
-                        indexesToRemove.push(i);
+                for (var i = 0; i < state.collect.length && eliminated < ELIMINATE_COUNT; i++) {
+                    if (canEliminate.includes(state.collect[i].type)) {
+                        indexes.push(i);
                         eliminated++;
                     }
                 }
 
-                // 添加消除动画
-                indexesToRemove.forEach(function(index) {
-                    var cell = elements.collectGrid.children[index];
-                    var tile = cell.querySelector('.tile');
-                    if (tile) {
-                        tile.classList.add('eliminating');
-                    }
+                // 动画
+                indexes.forEach(function(idx) {
+                    var slot = $.collectGrid.children[idx];
+                    var tile = slot.querySelector('.tile');
+                    if (tile) tile.classList.add('eliminating');
                 });
 
                 playSound('eliminate');
 
-                // 延迟移除
                 setTimeout(function() {
-                    // 从后往前移除
-                    indexesToRemove.reverse().forEach(function(index) {
-                        gameState.collect.splice(index, 1);
+                    indexes.reverse().forEach(function(idx) {
+                        state.collect.splice(idx, 1);
                     });
-                    renderCollectGrid();
-
-                    // 再次检查
+                    renderGame();
                     setTimeout(function() {
                         checkEliminate();
                         checkWin();
                     }, 100);
                 }, 300);
             } else {
-                // 检查失败
                 checkFail();
             }
         }
 
         function checkWin() {
-            // 所有图标都被消除
-            var remaining = gameState.tiles.filter(function(t) { return t.type !== null; });
+            var remaining = state.tiles.filter(function(t) { return t.type !== null; });
             if (remaining.length === 0) {
-                gameState.isPlaying = false;
+                state.isPlaying = false;
                 saveStats(true);
 
-                var elapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
-                var minutes = Math.floor(elapsed / 60);
-                var seconds = elapsed % 60;
-                elements.winTime.textContent = '用时：' +
-                    (minutes < 10 ? '0' : '') + minutes + ':' +
-                    (seconds < 10 ? '0' : '') + seconds;
+                var elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+                var m = Math.floor(elapsed / 60);
+                var s = elapsed % 60;
+                $.winTime.textContent = '用时：' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
 
                 showScreen('win');
                 playSound('win');
@@ -1027,22 +986,16 @@
         }
 
         function checkFail() {
-            // 收集区满了
-            if (gameState.collect.length >= COLLECT_SIZE) {
-                // 检查是否还能消除
+            if (state.collect.length >= COLLECT_SIZE) {
                 var typeCount = {};
-                gameState.collect.forEach(function(item) {
-                    if (item) {
-                        typeCount[item.type] = (typeCount[item.type] || 0) + 1;
-                    }
+                state.collect.forEach(function(item) {
+                    if (item) typeCount[item.type] = (typeCount[item.type] || 0) + 1;
                 });
 
-                var canEliminate = Object.values(typeCount).some(function(count) {
-                    return count >= ELIMINATE_COUNT;
-                });
+                var canEliminate = Object.values(typeCount).some(function(c) { return c >= ELIMINATE_COUNT; });
 
                 if (!canEliminate) {
-                    gameState.isPlaying = false;
+                    state.isPlaying = false;
                     saveStats(false);
                     showScreen('fail');
                     playSound('fail');
@@ -1051,48 +1004,39 @@
         }
 
         function useProp() {
-            if (!gameState.isPlaying) return;
-            if (gameState.propCount <= 0) return;
-            if (gameState.collect.length < 3) return;
+            if (!state.isPlaying || state.propCount <= 0 || state.collect.length < 3) return;
 
             playSound('click');
+            state.propCount--;
+            $.propCount.textContent = state.propCount;
+            $.btnProp.disabled = state.propCount <= 0;
 
-            gameState.propCount--;
-            elements.propCount.textContent = gameState.propCount;
-            if (gameState.propCount <= 0) {
-                elements.btnProp.disabled = true;
-            }
-
-            // 移除最左边的3个
+            // 移除最左3个
             var removed = 0;
-            var indexesToRemove = [];
-
-            for (var i = 0; i < gameState.collect.length && removed < 3; i++) {
-                if (gameState.collect[i]) {
-                    indexesToRemove.push(i);
+            var indexes = [];
+            for (var i = 0; i < state.collect.length && removed < 3; i++) {
+                if (state.collect[i]) {
+                    indexes.push(i);
                     removed++;
                 }
             }
 
-            // 添加动画
-            indexesToRemove.forEach(function(index) {
-                var cell = elements.collectGrid.children[index];
-                var tile = cell.querySelector('.tile');
-                if (tile) {
-                    tile.classList.add('eliminating');
-                }
+            indexes.forEach(function(idx) {
+                var slot = $.collectGrid.children[idx];
+                var tile = slot.querySelector('.tile');
+                if (tile) tile.classList.add('eliminating');
             });
 
             setTimeout(function() {
-                indexesToRemove.reverse().forEach(function(index) {
-                    gameState.collect.splice(index, 1);
+                indexes.reverse().forEach(function(idx) {
+                    state.collect.splice(idx, 1);
                 });
-                renderCollectGrid();
+                renderGame();
                 checkWin();
             }, 300);
         }
 
-        // ==================== 启动 ====================
+        // 启动
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
