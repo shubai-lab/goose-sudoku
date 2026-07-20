@@ -146,18 +146,37 @@
             position: relative;
         }
 
-        /* 层级 - 三层堆叠在一起 */
+        /* 层级 - 三层堆叠，有偏移产生层叠感 */
         .layer {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
             display: grid;
             gap: 2px;
         }
 
-        /* 各层使用 z-index 堆叠，格子大小不同实现遮罩 */
-        .layer-3 { z-index: 1; } /* 最底层 - 格子最大 */
-        .layer-2 { z-index: 2; } /* 中间层 */
-        .layer-1 { z-index: 3; } /* 最顶层 - 格子最小 */
+        /* 各层位置不同，产生偏移 */
+        /* 最底层 */
+        .layer-3 {
+            z-index: 1;
+            top: 0; left: 0;
+            width: calc(100% - 0px);
+            height: 100%;
+        }
+
+        /* 中间层 - 向右下偏移 */
+        .layer-2 {
+            z-index: 2;
+            top: 15%; left: 10%;
+            width: calc(100% - 10px);
+            height: calc(100% - 15%);
+        }
+
+        /* 最顶层 - 继续向右下偏移 */
+        .layer-1 {
+            z-index: 3;
+            top: 30%; left: 20%;
+            width: calc(100% - 20px);
+            height: calc(100% - 30%);
+        }
 
         /* 格子 */
         .tile-slot {
@@ -169,7 +188,7 @@
             position: relative;
         }
 
-        /* 图标 - 底层最大 */
+        /* 图标 */
         .tile {
             width: 100%;
             height: 100%;
@@ -181,19 +200,18 @@
             cursor: pointer;
             transition: all 0.1s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.25);
-            position: relative;
         }
 
-        /* 中层 - 稍小，产生遮罩 */
+        /* 中层格子稍大 */
         .layer-2 .tile {
-            width: 85%;
-            height: 85%;
+            width: 95%;
+            height: 95%;
         }
 
-        /* 顶层 - 最小，显示在中间 */
+        /* 顶层格子最大 */
         .layer-1 .tile {
-            width: 70%;
-            height: 70%;
+            width: 90%;
+            height: 90%;
         }
 
         .tile:active { transform: scale(0.95); }
@@ -461,27 +479,19 @@
         'use strict';
 
         // ==================== 关卡生成器配置 ====================
+        // 金字塔布局：底层35张完整，中层20张偏移，顶层9张偏移
         var DIFFICULTY_CONFIG = {
             1: { // 简单
-                layerCount: 3,
-                layerSizes: [35, 28, 21],  // 从底层到顶层
                 types: 6,
-                maxPerType: 6,
-                style: 'pyramid'
+                maxPerType: 6
             },
             2: { // 普通
-                layerCount: 3,
-                layerSizes: [42, 35, 21],
                 types: 8,
-                maxPerType: 9,
-                style: 'diamond'
+                maxPerType: 9
             },
             3: { // 困难
-                layerCount: 3,
-                layerSizes: [49, 42, 21],
                 types: 10,
-                maxPerType: 12,
-                style: 'random'
+                maxPerType: 12
             }
         };
 
@@ -747,45 +757,60 @@
             var cards = [];
             var typeIndex = 0;
 
-            // 各层都在 7x5 的格子范围内
-            var maxRows = 5;
+            // 金字塔布局：底层完整，上层递减并偏移
+            var rows = 5;
             var cols = 7;
 
-            // 从底层(3)到顶层(1)
-            for (var layer = config.layerCount; layer >= 1; layer--) {
-                // 根据布局样式决定哪些格子放置卡片
-                for (var row = 0; row < maxRows; row++) {
-                    for (var col = 0; col < cols; col++) {
-                        if (cards.length >= totalCards) break;
+            // Layer 3 (最底层) - 完整排列
+            var layer3Rows = 5;
+            var layer3Cols = 7;
+            for (var row = 0; row < layer3Rows; row++) {
+                for (var col = 0; col < layer3Cols; col++) {
+                    cards.push({
+                        id: cards.length,
+                        type: typePool[typeIndex++],
+                        layer: 3,
+                        row: row,
+                        col: col,
+                        removed: false
+                    });
+                }
+            }
 
-                        // 根据布局样式决定是否放置
-                        var shouldPlace = false;
-                        if (config.style === 'pyramid') {
-                            // 金字塔：上下窄，中间宽
-                            var middleRow = Math.floor(maxRows / 2);
-                            var widthAtRow = Math.max(4, cols - Math.abs(row - middleRow));
-                            shouldPlace = col < widthAtRow;
-                        } else if (config.style === 'diamond') {
-                            // 菱形：中间宽，上下窄
-                            var middleRow = Math.floor(maxRows / 2);
-                            var distFromMiddle = Math.abs(row - middleRow);
-                            var widthAtRow = Math.max(4, cols - distFromMiddle * 2);
-                            shouldPlace = col < widthAtRow;
-                        } else {
-                            // 随机：全部放置
-                            shouldPlace = true;
-                        }
+            // Layer 2 (中层) - 4行×5列，向右下偏移
+            var layer2Rows = 4;
+            var layer2Cols = 5;
+            var offset2Row = 0;
+            var offset2Col = 1;
+            for (var row = 0; row < layer2Rows; row++) {
+                for (var col = 0; col < layer2Cols; col++) {
+                    cards.push({
+                        id: cards.length,
+                        type: typePool[typeIndex++],
+                        layer: 2,
+                        row: row + offset2Row,
+                        col: col + offset2Col,
+                        removed: false
+                    });
+                }
+            }
 
-                        if (shouldPlace && cards.length < totalCards) {
-                            cards.push({
-                                id: cards.length,
-                                type: typePool[typeIndex++],
-                                layer: layer,
-                                row: row,
-                                col: col,
-                                removed: false
-                            });
-                        }
+            // Layer 1 (顶层) - 3行×3列，继续偏移
+            var layer1Rows = 3;
+            var layer1Cols = 3;
+            var offset1Row = 1;
+            var offset1Col = 2;
+            for (var row = 0; row < layer1Rows; row++) {
+                for (var col = 0; col < layer1Cols; col++) {
+                    if (cards.length < totalCards) {
+                        cards.push({
+                            id: cards.length,
+                            type: typePool[typeIndex++],
+                            layer: 1,
+                            row: row + offset1Row,
+                            col: col + offset1Col,
+                            removed: false
+                        });
                     }
                 }
             }
@@ -812,11 +837,14 @@
                     var rowDiff = Math.abs(other.row - card.row);
                     var colDiff = Math.abs(other.col - card.col);
 
-                    // 完全覆盖：同一位置
-                    // 错开覆盖：相邻格子（根据文档，层间偏移一半格子大小）
-                    if ((other.row === card.row && other.col === card.col) ||
-                        (rowDiff === 0 && colDiff === 1) ||
-                        (rowDiff === 1 && colDiff === 0)) {
+                    // 覆盖判定：同一位置或相邻位置
+                    // 根据规则，上层会覆盖下层边缘，露出中心
+                    if (rowDiff <= 0 && colDiff <= 0) {
+                        // 完全覆盖
+                        card.blocked = true;
+                        break;
+                    } else if (rowDiff <= 1 && colDiff <= 1) {
+                        // 错开覆盖（覆盖面积 > 30%）
                         card.blocked = true;
                         break;
                     }
