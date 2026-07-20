@@ -909,13 +909,13 @@
 
             playSound('click');
 
+            // 保存被点击的图标类型
+            var clickedType = tile.type;
+
             // 从数据中移除
             tile.type = null;
 
             // 添加到收集区
-            state.collect.push({ type: tile.type === null ? tile.type : null });
-            var clickedType = tile.type;
-            state.collect.pop();
             state.collect.push({ type: clickedType });
 
             renderGame();
