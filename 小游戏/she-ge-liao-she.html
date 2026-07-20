@@ -154,10 +154,10 @@
             gap: 2px;
         }
 
-        /* 各层使用 z-index 堆叠 */
-        .layer-3 { z-index: 1; } /* 最底层 */
+        /* 各层使用 z-index 堆叠，格子大小不同实现遮罩 */
+        .layer-3 { z-index: 1; } /* 最底层 - 格子最大 */
         .layer-2 { z-index: 2; } /* 中间层 */
-        .layer-1 { z-index: 3; } /* 最顶层 */
+        .layer-1 { z-index: 3; } /* 最顶层 - 格子最小 */
 
         /* 格子 */
         .tile-slot {
@@ -166,9 +166,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
-        /* 图标 */
+        /* 图标 - 底层最大 */
         .tile {
             width: 100%;
             height: 100%;
@@ -180,6 +181,19 @@
             cursor: pointer;
             transition: all 0.1s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+            position: relative;
+        }
+
+        /* 中层 - 稍小，产生遮罩 */
+        .layer-2 .tile {
+            width: 85%;
+            height: 85%;
+        }
+
+        /* 顶层 - 最小，显示在中间 */
+        .layer-1 .tile {
+            width: 70%;
+            height: 70%;
         }
 
         .tile:active { transform: scale(0.95); }
@@ -786,19 +800,27 @@
         // 计算卡片是否被遮挡
         function calculateBlocked(cards) {
             cards.forEach(function(card) {
+                if (card.removed) {
+                    card.blocked = false;
+                    return;
+                }
+
                 card.blocked = false;
 
-                // 检查上层卡片
+                // 检查上层（layer 数字越大越上）
                 for (var i = 0; i < cards.length; i++) {
                     var other = cards[i];
                     if (other.layer <= card.layer || other.removed) continue;
 
-                    // 同一行列或相邻
+                    // 检查位置关系
                     var rowDiff = Math.abs(other.row - card.row);
                     var colDiff = Math.abs(other.col - card.col);
 
+                    // 完全覆盖：同一位置
+                    // 错开覆盖：相邻格子（根据文档，层间偏移一半格子大小）
                     if ((other.row === card.row && other.col === card.col) ||
-                        (rowDiff <= 1 && colDiff <= 1)) {
+                        (rowDiff === 0 && colDiff === 1) ||
+                        (rowDiff === 1 && colDiff === 0)) {
                         card.blocked = true;
                         break;
                     }
