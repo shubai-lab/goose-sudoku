@@ -20,6 +20,9 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            overflow-x: hidden;
+            touch-action: none;
+            -webkit-overflow-scrolling: touch;
         }
 
         .container {
@@ -238,18 +241,54 @@
             color: #6b5b95;
         }
 
-        @media (max-width: 400px) {
+        /* 手机适配 1334x750 */
+        @media (max-width: 450px) {
+            .container {
+                padding: 0 10px;
+            }
+            .title {
+                font-size: 32px;
+            }
+            .header {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
             .game-board {
-                width: 300px;
-                height: 300px;
+                width: calc(100vw - 30px);
+                max-width: 340px;
+                height: auto;
+                aspect-ratio: 1;
+                padding: 10px;
+            }
+            .grid-background, .tiles-container {
+                gap: 8px;
+            }
+            .subtitle {
+                font-size: 12px;
+            }
+            .controls {
+                flex-wrap: wrap;
+            }
+            .btn {
+                padding: 10px 16px;
+                font-size: 13px;
+                flex: 1;
+                min-width: 100px;
+            }
+            .instructions {
+                font-size: 12px;
+                padding: 12px;
+            }
+        }
+
+        /* 超小屏幕 */
+        @media (max-width: 350px) {
+            .game-board {
+                width: calc(100vw - 20px);
                 padding: 8px;
             }
-            .grid-background, .tiles-container { gap: 8px; }
-            .tile { font-size: 28px; }
-            .tile-128, .tile-256, .tile-512 { font-size: 24px; }
-            .tile-1024, .tile-2048 { font-size: 20px; }
-            .tile-super { font-size: 16px; }
-            .title { font-size: 36px; }
+            .grid-background, .tiles-container { gap: 6px; }
+            .title { font-size: 28px; }
         }
     </style>
 </head>
@@ -423,12 +462,20 @@
 
         function setupTouch() {
             var board = document.getElementById('game-board');
+            var container = document.querySelector('.container');
 
+            // 触摸开始
             board.addEventListener('touchstart', function(e) {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
             }, { passive: true });
 
+            // 触摸移动 - 阻止页面滚动
+            board.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+
+            // 触摸结束
             board.addEventListener('touchend', function(e) {
                 if (gameOver || won || isAnimating) return;
 
@@ -449,7 +496,7 @@
                 }
             }, { passive: true });
 
-            // 也支持鼠标点击拖拽
+            // 鼠标拖拽
             board.addEventListener('mousedown', function(e) {
                 touchStartX = e.clientX;
                 touchStartY = e.clientY;
