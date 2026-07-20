@@ -141,43 +141,47 @@
 
         .map-container {
             width: 100%;
-            max-width: 420px;
-            height: 320px;
+            max-width: 450px;
+            height: 340px;
             position: relative;
             background: rgba(41, 25, 67, 0.2);
             border-radius: 8px;
+            overflow: hidden;
         }
 
-        /* 层级 - 三层堆叠，有偏移产生层叠感 */
+        /* 层级 */
         .layer {
             position: absolute;
-            display: grid;
-            gap: 2px;
         }
 
-        /* 格子固定 60x60 */
+        .tile-slot {
+            width: 60px;
+            height: 60px;
+            float: left;
+        }
+
+        /* 底层 - 5行×7列 */
         .layer-3 {
             z-index: 1;
-            top: 5px; left: 5px;
-            /* 5行×7列 = 35个格子 */
-            grid-template-columns: repeat(7, 60px);
-            grid-template-rows: repeat(5, 60px);
+            top: 0;
+            left: 0;
+            width: 434px; /* 7 * 60 + 6 * 2 间距 */
         }
 
+        /* 中层 - 偏移 */
         .layer-2 {
             z-index: 2;
-            top: 15px; left: 25px;
-            /* 4行×5列 = 20个格子 */
-            grid-template-columns: repeat(7, 60px);
-            grid-template-rows: repeat(5, 60px);
+            top: 10px;
+            left: 15px;
+            width: 434px;
         }
 
+        /* 顶层 - 继续偏移 */
         .layer-1 {
             z-index: 3;
-            top: 25px; left: 45px;
-            /* 3行×3列 = 9个格子 */
-            grid-template-columns: repeat(7, 60px);
-            grid-template-rows: repeat(5, 60px);
+            top: 20px;
+            left: 30px;
+            width: 434px;
         }
 
         /* 格子 */
@@ -914,24 +918,19 @@
                 $.collectGrid.appendChild(slot);
             }
 
-            // 所有层都用 5行×7列 的固定格子
             var rows = 5;
             var cols = 7;
 
-            // 配置各层
+            // 各层配置
             var layerConfigs = [
                 { id: 3, el: $.layer3 },  // 底层
                 { id: 2, el: $.layer2 },  // 中层
                 { id: 1, el: $.layer1 }   // 顶层
             ];
 
-            // 先渲染最底层，再渲染中层，最后渲染顶层
+            // 渲染各层
             layerConfigs.forEach(function(cfg) {
                 var el = cfg.el;
-                el.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
-                el.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
-
-                // 获取该层的卡片
                 var layerCards = state.cards.filter(function(c) {
                     return c.layer === cfg.id && !c.removed;
                 });
