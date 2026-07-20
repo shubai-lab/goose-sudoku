@@ -143,7 +143,7 @@
             align-items: center;
             justify-content: center;
             padding: 10px;
-            position: relative;
+            min-height: 300px;
         }
 
         .map-container {
@@ -153,40 +153,43 @@
             position: relative;
         }
 
-        /* 层级容器 */
+        /* 层级 */
         .layer {
             position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 0;
+            right: 0;
             display: grid;
-            gap: 3px;
+            gap: 2px;
         }
 
-        /* 第3层 - 最底层（最多格子） */
+        /* 第3层 - 最底层（5行×7列） */
         .layer-3 {
             bottom: 0;
             grid-template-columns: repeat(7, 1fr);
             grid-template-rows: repeat(5, 1fr);
+            height: 50%;
         }
 
-        /* 第2层 - 中间层 */
+        /* 第2层 - 中间层（4行×7列） */
         .layer-2 {
-            bottom: 20px;
+            bottom: 15%;
             grid-template-columns: repeat(7, 1fr);
             grid-template-rows: repeat(4, 1fr);
+            height: 40%;
         }
 
-        /* 第1层 - 最上层（最少格子） */
+        /* 第1层 - 最上层（3行×7列） */
         .layer-1 {
-            bottom: 35px;
+            bottom: 30%;
             grid-template-columns: repeat(7, 1fr);
             grid-template-rows: repeat(3, 1fr);
+            height: 25%;
         }
 
         /* 格子 */
         .tile-slot {
-            aspect-ratio: 1;
-            position: relative;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -194,17 +197,16 @@
 
         /* 图标 */
         .tile {
-            width: 90%;
-            height: 90%;
+            width: 100%;
+            height: 100%;
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             transition: all 0.15s ease;
-            position: absolute;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .tile:active {
