@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>杀了个杀</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -60,19 +56,31 @@
             margin: 10px 0;
         }
 
-        .stat-item {
-            text-align: center;
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 700; color: #fff; }
+        .stat-label { font-size: 12px; color: rgba(255,255,255,0.8); }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
         }
 
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
+        .diff-btn {
+            padding: 8px 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .diff-btn.active {
+            background: #905F9D;
+            border-color: #905F9D;
             color: #fff;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: rgba(255,255,255,0.8);
         }
 
         .menu-btn {
@@ -86,11 +94,7 @@
             font-weight: 600;
             cursor: pointer;
         }
-
-        .menu-btn:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
+        .menu-btn:hover { background: rgba(255,255,255,0.3); }
         .menu-btn-primary {
             background: #905F9D;
             border: none;
@@ -104,7 +108,6 @@
             display: none;
             flex-direction: column;
             flex: 1;
-            position: relative;
         }
 
         .game-header {
@@ -115,40 +118,30 @@
             color: #fff;
         }
 
-        .game-title {
-            font-size: 14px;
-            font-weight: 600;
-        }
+        .game-title { font-size: 14px; font-weight: 600; }
+        .game-level { font-size: 12px; opacity: 0.8; }
 
-        .header-btns {
-            display: flex;
-            gap: 10px;
-        }
-
+        .header-btns { display: flex; gap: 10px; }
         .header-btn {
-            width: 32px;
-            height: 32px;
+            width: 32px; height: 32px;
             background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 50%;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
+            border: none; border-radius: 50%;
+            color: #fff; font-size: 14px; cursor: pointer;
         }
 
-        /* 地图区域 - 纺锤形 */
+        /* 地图区域 */
         .map-area {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
-            min-height: 300px;
+            padding: 5px;
+            overflow: hidden;
         }
 
         .map-container {
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
             height: 100%;
             position: relative;
         }
@@ -156,35 +149,15 @@
         /* 层级 */
         .layer {
             position: absolute;
-            left: 0;
-            right: 0;
+            left: 0; right: 0;
             display: grid;
             gap: 2px;
         }
 
-        /* 第3层 - 最底层（5行×7列） */
-        .layer-3 {
-            bottom: 0;
-            grid-template-columns: repeat(7, 1fr);
-            grid-template-rows: repeat(5, 1fr);
-            height: 50%;
-        }
-
-        /* 第2层 - 中间层（4行×7列） */
-        .layer-2 {
-            bottom: 15%;
-            grid-template-columns: repeat(7, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            height: 40%;
-        }
-
-        /* 第1层 - 最上层（3行×7列） */
-        .layer-1 {
-            bottom: 30%;
-            grid-template-columns: repeat(7, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            height: 25%;
-        }
+        /* 各层 */
+        .layer-3 { bottom: 0; }
+        .layer-2 { bottom: 12%; }
+        .layer-1 { bottom: 22%; }
 
         /* 格子 */
         .tile-slot {
@@ -199,28 +172,22 @@
         .tile {
             width: 100%;
             height: 100%;
-            border-radius: 6px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.15s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
         }
 
-        .tile:active {
-            transform: scale(0.95);
-        }
-
+        .tile:active { transform: scale(0.95); }
         .tile.disabled {
-            opacity: 0.35;
+            opacity: 0.25;
             cursor: not-allowed;
         }
-
-        .tile.disabled:active {
-            transform: none;
-        }
+        .tile.disabled:active { transform: none; }
 
         /* 图标类型 */
         .tile-red { background: linear-gradient(135deg, #ff6b6b, #ee5a5a); }
@@ -230,16 +197,16 @@
         .tile-yellow { background: linear-gradient(135deg, #ffd43b, #fab005); }
         .tile-purple { background: linear-gradient(135deg, #da77f2, #be4bdb); }
 
-        /* 收集区域 */
+        /* 收集区 */
         .collect-area {
-            padding: 10px 15px;
+            padding: 8px 10px;
             background: rgba(41, 25, 67, 0.4);
         }
 
         .collect-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
+            gap: 3px;
             max-width: 380px;
             margin: 0 auto;
         }
@@ -247,86 +214,65 @@
         .collect-slot {
             aspect-ratio: 1;
             background: rgba(201, 183, 226, 0.3);
-            border-radius: 6px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .collect-slot .tile {
-            width: 85%;
-            height: 85%;
-            animation: tileAppear 0.2s ease-out;
+            width: 90%;
+            height: 90%;
+            animation: tileAppear 0.15s ease-out;
         }
 
         @keyframes tileAppear {
-            0% { transform: scale(0) rotate(-10deg); }
-            100% { transform: scale(1) rotate(0); }
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
         }
 
         @keyframes tileEliminate {
             0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); }
+            50% { transform: scale(1.2); }
             100% { transform: scale(0); opacity: 0; }
         }
 
-        .tile.eliminating {
-            animation: tileEliminate 0.3s ease-out forwards;
-        }
+        .tile.eliminating { animation: tileEliminate 0.25s ease-out forwards; }
 
         /* 底部按钮 */
         .game-footer {
             display: flex;
             justify-content: space-between;
-            padding: 10px 15px;
-            padding-bottom: 20px;
+            padding: 8px 15px;
+            padding-bottom: 15px;
         }
 
         .prop-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 14px;
+            display: flex; align-items: center; gap: 5px;
+            padding: 8px 12px;
             background: #905F9D;
-            border: none;
-            border-radius: 20px;
-            color: #fff;
-            font-size: 13px;
+            border: none; border-radius: 18px;
+            color: #fff; font-size: 12px;
         }
-
-        .prop-btn:disabled {
-            opacity: 0.5;
-        }
-
-        .prop-btn .icon {
-            font-size: 16px;
-        }
-
+        .prop-btn:disabled { opacity: 0.5; }
+        .prop-btn .icon { font-size: 14px; }
         .prop-btn .count {
-            background: #fff;
-            color: #905F9D;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
+            background: #fff; color: #905F9D;
+            padding: 1px 5px; border-radius: 8px;
+            font-size: 10px; font-weight: 600;
         }
 
         .give-up-btn {
-            padding: 10px 14px;
+            padding: 8px 12px;
             background: rgba(255,255,255,0.15);
-            border: none;
-            border-radius: 20px;
-            color: #fff;
-            font-size: 13px;
+            border: none; border-radius: 18px;
+            color: #fff; font-size: 12px;
         }
 
         /* 弹窗 */
         .modal {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(41, 25, 67, 0.92);
             display: none;
             flex-direction: column;
@@ -334,122 +280,68 @@
             justify-content: center;
             z-index: 100;
         }
-
-        .modal.active {
-            display: flex;
-        }
+        .modal.active { display: flex; }
 
         .modal-content {
             background: #fff;
-            border-radius: 16px;
-            padding: 25px;
+            border-radius: 14px;
+            padding: 20px;
             text-align: center;
-            max-width: 280px;
-            width: 90%;
+            max-width: 260px;
+            width: 88%;
         }
 
-        .modal-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: #5a4a7a;
-            margin-bottom: 15px;
-        }
+        .modal-title { font-size: 22px; font-weight: 800; color: #5a4a7a; margin-bottom: 12px; }
+        .modal-title.win { color: #905F9D; }
+        .modal-text { font-size: 13px; color: #666; margin-bottom: 6px; }
 
-        .modal-title.win {
-            color: #905F9D;
-        }
-
-        .modal-text {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .modal-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
+        .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
         .modal-btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 10px 18px;
+            border: none; border-radius: 18px;
+            font-size: 13px; font-weight: 600;
             cursor: pointer;
         }
+        .modal-btn-primary { background: #905F9D; color: #fff; }
+        .modal-btn-secondary { background: rgba(144, 95, 157, 0.15); color: #905F9D; }
 
-        .modal-btn-primary {
-            background: #905F9D;
-            color: #fff;
-        }
-
-        .modal-btn-secondary {
-            background: rgba(144, 95, 157, 0.15);
-            color: #905F9D;
-        }
-
-        /* 设置弹窗 */
-        .settings-content {
-            text-align: left;
-        }
-
+        /* 设置 */
+        .settings-content { text-align: left; }
         .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0;
             border-bottom: 1px solid #eee;
         }
-
-        .setting-item:last-of-type {
-            border-bottom: none;
-        }
+        .setting-item:last-of-type { border-bottom: none; }
 
         .toggle {
-            width: 44px;
-            height: 24px;
-            background: #ccc;
-            border-radius: 12px;
-            position: relative;
-            cursor: pointer;
+            width: 40px; height: 22px;
+            background: #ccc; border-radius: 11px;
+            position: relative; cursor: pointer;
         }
-
-        .toggle.active {
-            background: #905F9D;
-        }
-
+        .toggle.active { background: #905F9D; }
         .toggle::after {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
+            width: 18px; height: 18px;
+            background: #fff; border-radius: 50%;
+            top: 2px; left: 2px;
             transition: all 0.2s;
         }
+        .toggle.active::after { left: 20px; }
 
-        .toggle.active::after {
-            left: 22px;
-        }
+        .close-modal { margin-top: 12px; padding: 8px; }
 
-        .close-modal {
-            margin-top: 15px;
-            padding: 10px;
+        /* 加载动画 */
+        .loading {
+            color: #fff;
+            font-size: 14px;
         }
 
         /* 手机适配 */
-        @media (max-width: 400px) {
-            .tile {
-                font-size: 16px;
-            }
-            .menu-title {
-                font-size: 26px;
-            }
+        @media (max-width: 380px) {
+            .tile { font-size: 14px; }
+            .menu-title { font-size: 26px; }
         }
     </style>
 </head>
@@ -468,6 +360,11 @@
                     <div class="stat-label">已通关</div>
                 </div>
             </div>
+            <div class="difficulty-selector">
+                <button class="diff-btn active" data-diff="1">简单</button>
+                <button class="diff-btn" data-diff="2">普通</button>
+                <button class="diff-btn" data-diff="3">困难</button>
+            </div>
             <button class="menu-btn menu-btn-primary" id="btnStart">开始游戏</button>
             <button class="menu-btn" id="btnSettings">设置</button>
         </div>
@@ -475,7 +372,10 @@
         <!-- 游戏界面 -->
         <div class="game-screen" id="gameScreen">
             <div class="game-header">
-                <div class="game-title">每日一关</div>
+                <div>
+                    <div class="game-title">每日一关</div>
+                    <div class="game-level" id="levelInfo">第1关 · 简单</div>
+                </div>
                 <div class="header-btns">
                     <button class="header-btn" id="btnBack">←</button>
                     <button class="header-btn" id="btnGameSettings">⚙</button>
@@ -484,11 +384,8 @@
 
             <div class="map-area">
                 <div class="map-container" id="mapContainer">
-                    <!-- 第3层 - 最底层 -->
                     <div class="layer layer-3" id="layer3"></div>
-                    <!-- 第2层 - 中间层 -->
                     <div class="layer layer-2" id="layer2"></div>
-                    <!-- 第1层 - 最上层 -->
                     <div class="layer layer-1" id="layer1"></div>
                 </div>
             </div>
@@ -512,8 +409,9 @@
             <div class="modal-content">
                 <div class="modal-title win">🎉 恭喜通关！</div>
                 <div class="modal-text" id="winTime">用时：00:00</div>
+                <div class="modal-text" id="winLevel">第1关</div>
                 <div class="modal-btns">
-                    <button class="modal-btn modal-btn-primary" id="btnWinRestart">再来一局</button>
+                    <button class="modal-btn modal-btn-primary" id="btnWinRestart">下一关</button>
                     <button class="modal-btn modal-btn-secondary" id="btnWinMenu">返回主页</button>
                 </div>
             </div>
@@ -525,7 +423,7 @@
                 <div class="modal-title">😢 再接再厉</div>
                 <div class="modal-text">格子已满，无法继续</div>
                 <div class="modal-btns">
-                    <button class="modal-btn modal-btn-primary" id="btnFailRestart">再来一局</button>
+                    <button class="modal-btn modal-btn-primary" id="btnFailRestart">重试本关</button>
                     <button class="modal-btn modal-btn-secondary" id="btnFailMenu">返回主页</button>
                 </div>
             </div>
@@ -548,22 +446,42 @@
     (function() {
         'use strict';
 
-        // ==================== 配置 ====================
-        var TILE_TYPES = ['red', 'black', 'blue', 'green', 'yellow', 'purple'];
+        // ==================== 关卡生成器配置 ====================
+        var DIFFICULTY_CONFIG = {
+            1: { // 简单
+                layerCount: 3,
+                layerSizes: [35, 28, 21],  // 从底层到顶层
+                types: 6,
+                maxPerType: 6,
+                style: 'pyramid'
+            },
+            2: { // 普通
+                layerCount: 3,
+                layerSizes: [42, 35, 21],
+                types: 8,
+                maxPerType: 9,
+                style: 'diamond'
+            },
+            3: { // 困难
+                layerCount: 3,
+                layerSizes: [49, 42, 21],
+                types: 10,
+                maxPerType: 12,
+                style: 'random'
+            }
+        };
+
+        var TILE_COLORS = ['red', 'black', 'blue', 'green', 'yellow', 'purple',
+                          'orange', 'pink', 'cyan', 'lime', 'indigo', 'amber'];
         var COLLECT_SIZE = 7;
         var ELIMINATE_COUNT = 3;
 
-        // 层级配置 - 纺锤形设计
-        var LAYERS = [
-            { id: 3, rows: 5, cols: 7, bottom: 0 },    // 最底层 - 最多格子
-            { id: 2, rows: 4, cols: 7, bottom: 20 },   // 中间层
-            { id: 1, rows: 3, cols: 7, bottom: 35 }    // 最上层 - 最少格子
-        ];
-
         // ==================== 游戏状态 ====================
         var state = {
-            tiles: [],           // 所有图标 [{id, type, layer, row, col}]
-            collect: [],         // 收集区 [{type}]
+            level: 1,
+            difficulty: 1,
+            cards: [],        // 所有卡片
+            collect: [],      // 收集区
             propCount: 1,
             startTime: null,
             isPlaying: false,
@@ -606,6 +524,9 @@
             $.failModal = document.getElementById('failModal');
             $.settingsModal = document.getElementById('settingsModal');
             $.winTime = document.getElementById('winTime');
+            $.winLevel = document.getElementById('winLevel');
+            $.levelInfo = document.getElementById('levelInfo');
+            $.diffBtns = document.querySelectorAll('.diff-btn');
         }
 
         function bindEvents() {
@@ -615,12 +536,20 @@
             $.btnGameSettings.addEventListener('click', showSettings);
             $.btnProp.addEventListener('click', useProp);
             $.btnGiveUp.addEventListener('click', giveUp);
-            $.btnWinRestart.addEventListener('click', restartGame);
+            $.btnWinRestart.addEventListener('click', nextLevel);
             $.btnWinMenu.addEventListener('click', backToMenu);
-            $.btnFailRestart.addEventListener('click', restartGame);
+            $.btnFailRestart.addEventListener('click', restartLevel);
             $.btnFailMenu.addEventListener('click', backToMenu);
             $.btnCloseSettings.addEventListener('click', hideSettings);
             $.toggleSound.addEventListener('click', toggleSound);
+
+            $.diffBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    $.diffBtns.forEach(function(b) { b.classList.remove('active'); });
+                    btn.classList.add('active');
+                    state.difficulty = parseInt(btn.dataset.diff);
+                });
+            });
 
             document.addEventListener('touchmove', function(e) {
                 if (state.isPlaying) e.preventDefault();
@@ -649,11 +578,12 @@
                 var data = JSON.parse(s);
                 $.totalGames.textContent = data.totalGames || 0;
                 $.totalWins.textContent = data.totalWins || 0;
+                state.level = data.currentLevel || 1;
             }
         }
 
         function saveStats(win) {
-            var data = { totalGames: 0, totalWins: 0 };
+            var data = { totalGames: 0, totalWins: 0, currentLevel: state.level };
             var s = localStorage.getItem('shege-stats');
             if (s) data = JSON.parse(s);
             data.totalGames = (data.totalGames || 0) + 1;
@@ -675,7 +605,11 @@
                 gain.gain.value = 0.1;
 
                 switch(type) {
-                    case 'click': osc.frequency.value = 440; osc.start(); osc.stop(ctx.currentTime + 0.05); break;
+                    case 'click':
+                        osc.frequency.value = 440;
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.05);
+                        break;
                     case 'eliminate':
                         osc.frequency.value = 660;
                         gain.gain.value = 0.15;
@@ -735,6 +669,139 @@
         function showSettings() { $.settingsModal.classList.add('active'); }
         function hideSettings() { $.settingsModal.classList.remove('active'); }
 
+        // ==================== 关卡生成器 ====================
+
+        // 生成种子随机数
+        function seededRandom(seed) {
+            var x = Math.sin(seed++) * 10000;
+            return x - Math.floor(x);
+        }
+
+        // 构建类型池（确保每种类型数量是3的倍数）
+        function buildTypePool(totalCards, typeCount, maxPerType) {
+            var pool = [];
+            var counts = [];
+
+            // 每种类型至少3张
+            for (var t = 0; t < typeCount; t++) {
+                for (var i = 0; i < 3; i++) {
+                    pool.push(t);
+                }
+                counts[t] = 3;
+            }
+
+            // 填充剩余卡片
+            var remaining = totalCards - pool.length;
+            while (remaining > 0) {
+                for (var t = 0; t < typeCount && remaining > 0; t++) {
+                    if (counts[t] < maxPerType) {
+                        pool.push(t);
+                        counts[t]++;
+                        remaining--;
+                    }
+                }
+                // 如果都到上限，重置计数继续填充
+                if (remaining > 0 && counts.every(function(c) { return c >= maxPerType; })) {
+                    for (var t = 0; t < typeCount && remaining > 0; t++) {
+                        pool.push(t);
+                        counts[t]++;
+                        remaining--;
+                    }
+                }
+            }
+
+            // Fisher-Yates 洗牌
+            for (var i = pool.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var tmp = pool[i];
+                pool[i] = pool[j];
+                pool[j] = tmp;
+            }
+
+            return pool;
+        }
+
+        // 生成关卡
+        function generateLevel(levelNum, difficulty) {
+            var config = DIFFICULTY_CONFIG[difficulty];
+            var totalCards = config.layerSizes.reduce(function(a, b) { return a + b; }, 0);
+
+            // 构建并洗牌类型池
+            var typePool = buildTypePool(totalCards, config.types, config.maxPerType);
+
+            // 生成卡片
+            var cards = [];
+            var cardId = 0;
+            var typeIndex = 0;
+
+            // 从底层(3)到顶层(1)
+            for (var layer = config.layerCount; layer >= 1; layer--) {
+                var rows = config.layerSizes[config.layerCount - layer] > 28 ? 5 : 4;
+                var cols = 7;
+
+                for (var row = 0; row < rows; row++) {
+                    for (var col = 0; col < cols; col++) {
+                        if (cardId >= totalCards) break;
+
+                        // 根据布局样式决定是否放置
+                        var shouldPlace = true;
+                        if (config.style === 'pyramid') {
+                            // 金字塔：上下窄，中间宽
+                            var middleRow = Math.floor(rows / 2);
+                            var maxWidth = cols;
+                            var widthAtRow = Math.max(3, maxWidth - Math.abs(row - middleRow));
+                            shouldPlace = col < widthAtRow;
+                        } else if (config.style === 'diamond') {
+                            // 菱形：中间宽，上下窄
+                            var middleRow = Math.floor(rows / 2);
+                            var distFromMiddle = Math.abs(row - middleRow);
+                            var widthAtRow = Math.max(4, cols - distFromMiddle * 2);
+                            shouldPlace = col < widthAtRow;
+                        }
+
+                        if (shouldPlace && cardId < totalCards) {
+                            cards.push({
+                                id: cardId,
+                                type: typePool[typeIndex++],
+                                layer: layer,
+                                row: row,
+                                col: col,
+                                removed: false
+                            });
+                            cardId++;
+                        }
+                    }
+                }
+            }
+
+            return cards;
+        }
+
+        // 计算卡片是否被遮挡
+        function calculateBlocked(cards) {
+            cards.forEach(function(card) {
+                card.blocked = false;
+
+                // 检查上层卡片
+                for (var i = 0; i < cards.length; i++) {
+                    var other = cards[i];
+                    if (other.layer <= card.layer || other.removed) continue;
+
+                    // 同一行列或相邻
+                    var rowDiff = Math.abs(other.row - card.row);
+                    var colDiff = Math.abs(other.col - card.col);
+
+                    if ((other.row === card.row && other.col === card.col) ||
+                        (rowDiff <= 1 && colDiff <= 1)) {
+                        card.blocked = true;
+                        break;
+                    }
+                }
+            });
+
+            return cards;
+        }
+
         // ==================== 游戏逻辑 ====================
         function startGame() {
             state.isPlaying = true;
@@ -744,16 +811,30 @@
             $.propCount.textContent = state.propCount;
             $.btnProp.disabled = false;
 
-            generateTiles();
+            // 生成关卡
+            state.cards = generateLevel(state.level, state.difficulty);
+            state.cards = calculateBlocked(state.cards);
+
+            // 更新关卡信息
+            var diffName = ['', '简单', '普通', '困难'][state.difficulty];
+            $.levelInfo.textContent = '第' + state.level + '关 · ' + diffName;
+
             renderGame();
             showScreen('game');
             playSound('click');
         }
 
-        function restartGame() {
+        function restartLevel() {
             hideSettings();
             $.winModal.classList.remove('active');
             $.failModal.classList.remove('active');
+            startGame();
+        }
+
+        function nextLevel() {
+            state.level++;
+            hideSettings();
+            $.winModal.classList.remove('active');
             startGame();
         }
 
@@ -771,50 +852,11 @@
             playSound('fail');
         }
 
-        // 生成图标 - 确保每种类型数量是3的倍数
-        function generateTiles() {
-            state.tiles = [];
-
-            // 计算总格子数
-            var totalSlots = LAYERS.reduce(function(sum, l) { return sum + l.rows * l.cols; }, 0);
-
-            // 生成足够数量的图标类型
-            var types = [];
-            var typeIndex = 0;
-            for (var i = 0; i < totalSlots; i++) {
-                types.push(TILE_TYPES[typeIndex % TILE_TYPES.length]);
-                typeIndex++;
-            }
-
-            // 打乱顺序
-            for (var i = types.length - 1; i > 0; i--) {
-                var j = Math.floor(Math.random() * (i + 1));
-                var tmp = types[i];
-                types[i] = types[j];
-                types[j] = tmp;
-            }
-
-            // 分配到各层
-            var index = 0;
-            LAYERS.forEach(function(layer) {
-                for (var row = 0; row < layer.rows; row++) {
-                    for (var col = 0; col < layer.cols; col++) {
-                        state.tiles.push({
-                            id: index,
-                            type: types[index],
-                            layer: layer.id,
-                            row: row,
-                            col: col
-                        });
-                        index++;
-                    }
-                }
-            });
-        }
-
         function renderGame() {
             // 清空所有层
-            [$.layer1, $.layer2, $.layer3].forEach(function(el) { el.innerHTML = ''; });
+            $.layer1.innerHTML = '';
+            $.layer2.innerHTML = '';
+            $.layer3.innerHTML = '';
             $.collectGrid.innerHTML = '';
 
             // 渲染收集区格子
@@ -824,43 +866,59 @@
                 $.collectGrid.appendChild(slot);
             }
 
+            // 设置各层的grid
+            var config = DIFFICULTY_CONFIG[state.difficulty];
+            var layerEls = [null, $.layer1, $.layer2, $.layer3];
+            var layerSizes = config.layerSizes;
+
+            for (var layer = 1; layer <= 3; layer++) {
+                var el = layerEls[layer];
+                var rows = layer === 1 ? Math.ceil(layerSizes[2] / 7) :
+                          layer === 2 ? Math.ceil(layerSizes[1] / 7) :
+                          Math.ceil(layerSizes[0] / 7);
+                el.style.gridTemplateColumns = 'repeat(7, 1fr)';
+                el.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
+            }
+
             // 按层渲染（第3层先渲染，第1层最后渲染）
             var layerOrder = [3, 2, 1];
             layerOrder.forEach(function(layerId) {
-                var layerEl = document.getElementById('layer' + layerId);
-                var layerConfig = LAYERS.find(function(l) { return l.id === layerId; });
+                var el = layerEls[layerId];
+                var layerCards = state.cards.filter(function(c) {
+                    return c.layer === layerId && !c.removed;
+                });
 
-                for (var row = 0; row < layerConfig.rows; row++) {
-                    for (var col = 0; col < layerConfig.cols; col++) {
+                var rows = layerId === 1 ? Math.ceil(layerSizes[2] / 7) :
+                          layerId === 2 ? Math.ceil(layerSizes[1] / 7) :
+                          Math.ceil(layerSizes[0] / 7);
+
+                for (var row = 0; row < rows; row++) {
+                    for (var col = 0; col < 7; col++) {
                         var slot = document.createElement('div');
                         slot.className = 'tile-slot';
-                        slot.dataset.layer = layerId;
-                        slot.dataset.row = row;
-                        slot.dataset.col = col;
 
-                        // 查找对应图标
-                        var tile = state.tiles.find(function(t) {
-                            return t.layer === layerId && t.row === row && t.col === col;
+                        // 查找对应卡片
+                        var card = layerCards.find(function(c) {
+                            return c.row === row && c.col === col;
                         });
 
-                        if (tile && tile.type) {
-                            var tileEl = document.createElement('div');
-                            tileEl.className = 'tile tile-' + tile.type;
-                            tileEl.dataset.id = tile.id;
+                        if (card) {
+                            var tile = document.createElement('div');
+                            tile.className = 'tile tile-' + TILE_COLORS[card.type % TILE_COLORS.length];
+                            tile.dataset.id = card.id;
 
-                            // 检测是否可点击
-                            if (!isTileClickable(tile)) {
-                                tileEl.classList.add('disabled');
+                            if (card.blocked) {
+                                tile.classList.add('disabled');
                             } else {
-                                tileEl.addEventListener('click', (function(t) {
-                                    return function() { clickTile(t); };
-                                })(tile));
+                                tile.addEventListener('click', (function(c) {
+                                    return function() { clickTile(c); };
+                                })(card));
                             }
 
-                            slot.appendChild(tileEl);
+                            slot.appendChild(tile);
                         }
 
-                        layerEl.appendChild(slot);
+                        el.appendChild(slot);
                     }
                 }
             });
@@ -869,59 +927,33 @@
             state.collect.forEach(function(item, i) {
                 var slot = $.collectGrid.children[i];
                 if (slot && item) {
-                    var tileEl = document.createElement('div');
-                    tileEl.className = 'tile tile-' + item.type;
-                    slot.appendChild(tileEl);
+                    var tile = document.createElement('div');
+                    tile.className = 'tile tile-' + TILE_COLORS[item.type % TILE_COLORS.length];
+                    slot.appendChild(tile);
                 }
             });
         }
 
-        // 检测图标是否可点击（没有被遮挡）
-        function isTileClickable(tile) {
-            // 从最上层往下检查
-            for (var l = tile.layer + 1; l <= 3; l++) {
-                var layerConfig = LAYERS.find(function(config) { return config.id === l; });
-                if (!layerConfig) continue;
-
-                // 检查是否有上层图标遮挡
-                var hasCover = state.tiles.some(function(t) {
-                    if (t.layer !== l || !t.type) return false;
-
-                    // 完全覆盖：同一行列
-                    if (t.row === tile.row && t.col === tile.col) return true;
-
-                    // 错开覆盖：相邻格（层内相邻也算遮挡）
-                    var rowDiff = Math.abs(t.row - tile.row);
-                    var colDiff = Math.abs(t.col - tile.col);
-                    if (rowDiff <= 1 && colDiff <= 1) return true;
-
-                    return false;
-                });
-
-                if (hasCover) return false;
-            }
-            return true;
-        }
-
-        function clickTile(tile) {
+        function clickTile(card) {
             if (!state.isPlaying) return;
             if (state.collect.length >= COLLECT_SIZE) return;
 
             playSound('click');
 
-            // 保存被点击的图标类型
-            var clickedType = tile.type;
-
-            // 从数据中移除
-            tile.type = null;
+            // 标记为已移除
+            card.removed = true;
+            var clickedType = card.type;
 
             // 添加到收集区
             state.collect.push({ type: clickedType });
 
+            // 重新计算遮挡
+            state.cards = calculateBlocked(state.cards);
+
             renderGame();
 
             // 检查消除
-            setTimeout(checkEliminate, 150);
+            setTimeout(checkEliminate, 100);
         }
 
         function checkEliminate() {
@@ -937,11 +969,11 @@
             });
 
             if (canEliminate.length > 0) {
-                var eliminated = 0;
                 var indexes = [];
+                var eliminated = 0;
 
                 for (var i = 0; i < state.collect.length && eliminated < ELIMINATE_COUNT; i++) {
-                    if (canEliminate.includes(state.collect[i].type)) {
+                    if (canEliminate.indexOf(state.collect[i].type.toString()) >= 0) {
                         indexes.push(i);
                         eliminated++;
                     }
@@ -964,15 +996,15 @@
                     setTimeout(function() {
                         checkEliminate();
                         checkWin();
-                    }, 100);
-                }, 300);
+                    }, 50);
+                }, 250);
             } else {
                 checkFail();
             }
         }
 
         function checkWin() {
-            var remaining = state.tiles.filter(function(t) { return t.type !== null; });
+            var remaining = state.cards.filter(function(c) { return !c.removed; });
             if (remaining.length === 0) {
                 state.isPlaying = false;
                 saveStats(true);
@@ -981,6 +1013,7 @@
                 var m = Math.floor(elapsed / 60);
                 var s = elapsed % 60;
                 $.winTime.textContent = '用时：' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+                $.winLevel.textContent = '第' + state.level + '关';
 
                 showScreen('win');
                 playSound('win');
@@ -1014,13 +1047,9 @@
             $.btnProp.disabled = state.propCount <= 0;
 
             // 移除最左3个
-            var removed = 0;
             var indexes = [];
-            for (var i = 0; i < state.collect.length && removed < 3; i++) {
-                if (state.collect[i]) {
-                    indexes.push(i);
-                    removed++;
-                }
+            for (var i = 0; i < state.collect.length && indexes.length < 3; i++) {
+                if (state.collect[i]) indexes.push(i);
             }
 
             indexes.forEach(function(idx) {
@@ -1035,7 +1064,7 @@
                 });
                 renderGame();
                 checkWin();
-            }, 300);
+            }, 250);
         }
 
         // 启动
