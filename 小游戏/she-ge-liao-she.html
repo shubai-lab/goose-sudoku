@@ -142,24 +142,22 @@
         .map-container {
             width: 100%;
             max-width: 400px;
-            height: 400px;
+            height: 100%;
             position: relative;
-            background: rgba(41, 25, 67, 0.3);
-            border-radius: 10px;
         }
 
-        /* 层级 */
+        /* 层级 - 三层堆叠在一起 */
         .layer {
             position: absolute;
-            left: 5px; right: 5px;
+            top: 0; left: 0; right: 0; bottom: 0;
             display: grid;
             gap: 2px;
         }
 
-        /* 各层 */
-        .layer-3 { bottom: 5px; height: 130px; }
-        .layer-2 { bottom: 135px; height: 120px; }
-        .layer-1 { bottom: 258px; height: 110px; }
+        /* 各层使用 z-index 堆叠 */
+        .layer-3 { z-index: 1; } /* 最底层 */
+        .layer-2 { z-index: 2; } /* 中间层 */
+        .layer-1 { z-index: 3; } /* 最顶层 */
 
         /* 格子 */
         .tile-slot {
@@ -736,32 +734,38 @@
             var cardId = 0;
             var typeIndex = 0;
 
+            // 各层都在 7x5 的格子范围内
+            var maxRows = 5;
+            var cols = 7;
+
             // 从底层(3)到顶层(1)
             for (var layer = config.layerCount; layer >= 1; layer--) {
-                var rows = config.layerSizes[config.layerCount - layer] > 28 ? 5 : 4;
-                var cols = 7;
+                var layerCardCount = config.layerSizes[config.layerCount - layer];
 
-                for (var row = 0; row < rows; row++) {
+                // 根据布局样式决定哪些格子放置卡片
+                for (var row = 0; row < maxRows; row++) {
                     for (var col = 0; col < cols; col++) {
                         if (cardId >= totalCards) break;
 
                         // 根据布局样式决定是否放置
-                        var shouldPlace = true;
+                        var shouldPlace = false;
                         if (config.style === 'pyramid') {
                             // 金字塔：上下窄，中间宽
-                            var middleRow = Math.floor(rows / 2);
-                            var maxWidth = cols;
-                            var widthAtRow = Math.max(3, maxWidth - Math.abs(row - middleRow));
-                            shouldPlace = col < widthAtRow;
+                            var middleRow = Math.floor(maxRows / 2);
+                            var widthAtRow = Math.max(4, cols - Math.abs(row - middleRow));
+                            shouldPlace = col < widthAtRow && cardId < totalCards;
                         } else if (config.style === 'diamond') {
                             // 菱形：中间宽，上下窄
-                            var middleRow = Math.floor(rows / 2);
+                            var middleRow = Math.floor(maxRows / 2);
                             var distFromMiddle = Math.abs(row - middleRow);
                             var widthAtRow = Math.max(4, cols - distFromMiddle * 2);
-                            shouldPlace = col < widthAtRow;
+                            shouldPlace = col < widthAtRow && cardId < totalCards;
+                        } else {
+                            // 随机：全部放置
+                            shouldPlace = cardId < totalCards;
                         }
 
-                        if (shouldPlace && cardId < totalCards) {
+                        if (shouldPlace) {
                             cards.push({
                                 id: cardId,
                                 type: typePool[typeIndex++],
@@ -868,31 +872,31 @@
                 $.collectGrid.appendChild(slot);
             }
 
-            var config = DIFFICULTY_CONFIG[state.difficulty];
-            var layerEls = [null, $.layer1, $.layer2, $.layer3];
-            var layerSizes = config.layerSizes;
+            // 所有层都用 5行×7列 的固定格子
+            var rows = 5;
+            var cols = 7;
 
-            // 设置各层的grid并渲染
-            // layer[1] = 最顶层, layer[3] = 最底层
+            // 配置各层
             var layerConfigs = [
-                { id: 3, el: $.layer3, sizeIdx: 0, rows: 5 },  // 底层最多
-                { id: 2, el: $.layer2, sizeIdx: 1, rows: 4 },  // 中层
-                { id: 1, el: $.layer1, sizeIdx: 2, rows: 3 }    // 顶层最少
+                { id: 3, el: $.layer3 },  // 底层
+                { id: 2, el: $.layer2 },  // 中层
+                { id: 1, el: $.layer1 }   // 顶层
             ];
 
+            // 先渲染最底层，再渲染中层，最后渲染顶层
             layerConfigs.forEach(function(cfg) {
                 var el = cfg.el;
-                el.style.gridTemplateColumns = 'repeat(7, 1fr)';
-                el.style.gridTemplateRows = 'repeat(' + cfg.rows + ', 1fr)';
+                el.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+                el.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
 
                 // 获取该层的卡片
                 var layerCards = state.cards.filter(function(c) {
                     return c.layer === cfg.id && !c.removed;
                 });
 
-                // 渲染格子
-                for (var row = 0; row < cfg.rows; row++) {
-                    for (var col = 0; col < 7; col++) {
+                // 渲染格子（5行×7列）
+                for (var row = 0; row < rows; row++) {
+                    for (var col = 0; col < cols; col++) {
                         var slot = document.createElement('div');
                         slot.className = 'tile-slot';
 
