@@ -745,7 +745,6 @@
 
             // 生成卡片
             var cards = [];
-            var cardId = 0;
             var typeIndex = 0;
 
             // 各层都在 7x5 的格子范围内
@@ -754,12 +753,10 @@
 
             // 从底层(3)到顶层(1)
             for (var layer = config.layerCount; layer >= 1; layer--) {
-                var layerCardCount = config.layerSizes[config.layerCount - layer];
-
                 // 根据布局样式决定哪些格子放置卡片
                 for (var row = 0; row < maxRows; row++) {
                     for (var col = 0; col < cols; col++) {
-                        if (cardId >= totalCards) break;
+                        if (cards.length >= totalCards) break;
 
                         // 根据布局样式决定是否放置
                         var shouldPlace = false;
@@ -767,28 +764,27 @@
                             // 金字塔：上下窄，中间宽
                             var middleRow = Math.floor(maxRows / 2);
                             var widthAtRow = Math.max(4, cols - Math.abs(row - middleRow));
-                            shouldPlace = col < widthAtRow && cardId < totalCards;
+                            shouldPlace = col < widthAtRow;
                         } else if (config.style === 'diamond') {
                             // 菱形：中间宽，上下窄
                             var middleRow = Math.floor(maxRows / 2);
                             var distFromMiddle = Math.abs(row - middleRow);
                             var widthAtRow = Math.max(4, cols - distFromMiddle * 2);
-                            shouldPlace = col < widthAtRow && cardId < totalCards;
+                            shouldPlace = col < widthAtRow;
                         } else {
                             // 随机：全部放置
-                            shouldPlace = cardId < totalCards;
+                            shouldPlace = true;
                         }
 
-                        if (shouldPlace) {
+                        if (shouldPlace && cards.length < totalCards) {
                             cards.push({
-                                id: cardId,
+                                id: cards.length,
                                 type: typePool[typeIndex++],
                                 layer: layer,
                                 row: row,
                                 col: col,
                                 removed: false
                             });
-                            cardId++;
                         }
                     }
                 }
