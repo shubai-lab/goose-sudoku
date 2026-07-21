@@ -210,6 +210,19 @@
             pointer-events: auto;
         }
 
+        .victory-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            z-index: -1;
+            opacity: 0.4;
+            display: none;
+        }
+
         .overlay-title {
             font-size: 48px;
             font-weight: 800;
@@ -329,6 +342,7 @@
             </div>
             <div class="tiles-container" id="tiles-container"></div>
             <div class="overlay" id="overlay">
+                <video id="victory-video" class="victory-video" src="小游戏/2048-assets/victory.mp4" autoplay loop muted></video>
                 <div class="overlay-title" id="overlay-title">游戏结束</div>
                 <div class="overlay-subtitle" id="overlay-subtitle">最终得分：0</div>
                 <button class="btn btn-new" id="btn-retry">再玩一次</button>
@@ -359,7 +373,7 @@
         var SAVE_KEY = 'dazheng-e-2048-save';
         var BEST_KEY = 'dazheng-e-2048-best';
 
-        var tilesContainer, scoreEl, bestEl, overlay, overlayTitle, overlaySubtitle;
+        var tilesContainer, scoreEl, bestEl, overlay, overlayTitle, overlaySubtitle, victoryVideo;
 
         function init() {
             tilesContainer = document.getElementById('tiles-container');
@@ -368,6 +382,7 @@
             overlay = document.getElementById('overlay');
             overlayTitle = document.getElementById('overlay-title');
             overlaySubtitle = document.getElementById('overlay-subtitle');
+            victoryVideo = document.getElementById('victory-video');
 
             best = parseInt(localStorage.getItem(BEST_KEY) || '0');
             bestEl.textContent = best;
@@ -450,6 +465,12 @@
 
         function restart() {
             clearSave(); // 清除旧存档
+
+            // 隐藏胜利视频
+            if (victoryVideo) {
+                victoryVideo.style.display = 'none';
+                victoryVideo.pause();
+            }
 
             grid = [];
             for (var r = 0; r < size; r++) {
@@ -729,6 +750,16 @@
             overlayTitle.className = 'overlay-title' + (isWin ? ' win' : '');
             overlaySubtitle.textContent = subtitle;
             overlay.classList.add('active');
+
+            // 胜利时播放视频，结束时隐藏视频
+            if (isWin && victoryVideo) {
+                victoryVideo.style.display = 'block';
+                victoryVideo.currentTime = 0;
+                victoryVideo.play().catch(function() {});
+            } else if (victoryVideo) {
+                victoryVideo.style.display = 'none';
+                victoryVideo.pause();
+            }
         }
 
         function updateScoreDisplay() {
