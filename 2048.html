@@ -115,16 +115,6 @@
             background: #7a6aa8;
         }
 
-        .btn-test {
-            background: #e74c3c;
-        }
-
-        .btn-test:hover {
-            background: #c0392b;
-        }
-            background: #7a6aa8;
-        }
-
         .game-board {
             background: #8B77B9;
             border-radius: 10px;
@@ -220,19 +210,6 @@
             pointer-events: auto;
         }
 
-        .victory-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-            z-index: -1;
-            opacity: 0.4;
-            display: none;
-        }
-
         .overlay-title {
             font-size: 48px;
             font-weight: 800;
@@ -298,15 +275,10 @@
                 flex-wrap: wrap;
             }
             .controls .btn {
-                padding: 10px 12px;
-                font-size: 12px;
+                padding: 10px 16px;
+                font-size: 13px;
                 flex: 1;
-                min-width: 80px;
-            }
-            .btn-test {
-                background: #e74c3c;
-                font-size: 11px;
-                padding: 10px 8px;
+                min-width: 100px;
             }
             .instructions {
                 font-size: 12px;
@@ -346,7 +318,6 @@
         <div class="controls">
             <button class="btn btn-new" id="btn-new">新游戏</button>
             <button class="btn" id="btn-undo">撤销</button>
-            <button class="btn btn-test" id="btn-test-video">测试视频</button>
         </div>
 
         <div class="game-board" id="game-board">
@@ -358,7 +329,6 @@
             </div>
             <div class="tiles-container" id="tiles-container"></div>
             <div class="overlay" id="overlay">
-                <video id="victory-video" class="victory-video" autoplay loop muted playsinline preload="auto"></video>
                 <div class="overlay-title" id="overlay-title">游戏结束</div>
                 <div class="overlay-subtitle" id="overlay-subtitle">最终得分：0</div>
                 <button class="btn btn-new" id="btn-retry">再玩一次</button>
@@ -389,7 +359,7 @@
         var SAVE_KEY = 'dazheng-e-2048-save';
         var BEST_KEY = 'dazheng-e-2048-best';
 
-        var tilesContainer, scoreEl, bestEl, overlay, overlayTitle, overlaySubtitle, victoryVideo;
+        var tilesContainer, scoreEl, bestEl, overlay, overlayTitle, overlaySubtitle;
 
         function init() {
             tilesContainer = document.getElementById('tiles-container');
@@ -398,11 +368,6 @@
             overlay = document.getElementById('overlay');
             overlayTitle = document.getElementById('overlay-title');
             overlaySubtitle = document.getElementById('overlay-subtitle');
-            victoryVideo = document.getElementById('victory-video');
-
-            // 动态设置视频路径（兼容本地和线上）
-            var basePath = window.location.protocol === 'file:' ? '小游戏/' : '小游戏/';
-            victoryVideo.src = basePath + '2048-assets/victory.mp4';
 
             best = parseInt(localStorage.getItem(BEST_KEY) || '0');
             bestEl.textContent = best;
@@ -443,7 +408,6 @@
             document.getElementById('btn-new').addEventListener('click', restart);
             document.getElementById('btn-undo').addEventListener('click', undo);
             document.getElementById('btn-retry').addEventListener('click', restart);
-            document.getElementById('btn-test-video').addEventListener('click', testVideo);
 
             setupKeyboard();
             setupTouch();
@@ -486,12 +450,6 @@
 
         function restart() {
             clearSave(); // 清除旧存档
-
-            // 隐藏胜利视频
-            if (victoryVideo) {
-                victoryVideo.style.display = 'none';
-                victoryVideo.pause();
-            }
 
             grid = [];
             for (var r = 0; r < size; r++) {
@@ -771,16 +729,6 @@
             overlayTitle.className = 'overlay-title' + (isWin ? ' win' : '');
             overlaySubtitle.textContent = subtitle;
             overlay.classList.add('active');
-
-            // 胜利时播放视频，结束时隐藏视频
-            if (isWin && victoryVideo) {
-                victoryVideo.style.display = 'block';
-                victoryVideo.currentTime = 0;
-                victoryVideo.play().catch(function() {});
-            } else if (victoryVideo) {
-                victoryVideo.style.display = 'none';
-                victoryVideo.pause();
-            }
         }
 
         function updateScoreDisplay() {
@@ -839,11 +787,6 @@
                     tilesContainer.appendChild(tile);
                 }
             }
-        }
-
-        // 测试视频按钮
-        function testVideo() {
-            showOverlay('你赢了！', '测试模式 - 视频播放中', true);
         }
 
         // 页面加载完成后初始化
