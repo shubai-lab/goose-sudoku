@@ -210,6 +210,14 @@
             pointer-events: auto;
         }
 
+        .victory-video {
+            width: 128px;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
         .overlay-title {
             font-size: 48px;
             font-weight: 800;
@@ -332,6 +340,7 @@
                 <div class="overlay-title" id="overlay-title">游戏结束</div>
                 <div class="overlay-subtitle" id="overlay-subtitle">最终得分：0</div>
                 <button class="btn btn-new" id="btn-retry">再玩一次</button>
+                <video id="victory-video" class="victory-video" autoplay loop muted playsinline></video>
             </div>
         </div>
 
@@ -359,7 +368,7 @@
         var SAVE_KEY = 'dazheng-e-2048-save';
         var BEST_KEY = 'dazheng-e-2048-best';
 
-        var tilesContainer, scoreEl, bestEl, overlay, overlayTitle, overlaySubtitle;
+        var tilesContainer, scoreEl, bestEl, overlay, overlayTitle, overlaySubtitle, victoryVideo;
 
         function init() {
             tilesContainer = document.getElementById('tiles-container');
@@ -368,6 +377,14 @@
             overlay = document.getElementById('overlay');
             overlayTitle = document.getElementById('overlay-title');
             overlaySubtitle = document.getElementById('overlay-subtitle');
+            victoryVideo = document.getElementById('victory-video');
+
+            // 设置视频路径（本地用绝对路径，线上用相对路径）
+            if (window.location.protocol === 'file:') {
+                victoryVideo.src = 'file:///C:/Users/zhangfan/my-openspec-project/小游戏/2048-assets/victory.mp4';
+            } else {
+                victoryVideo.src = '小游戏/2048-assets/victory.mp4';
+            }
 
             best = parseInt(localStorage.getItem(BEST_KEY) || '0');
             bestEl.textContent = best;
@@ -450,6 +467,12 @@
 
         function restart() {
             clearSave(); // 清除旧存档
+
+            // 隐藏胜利视频
+            if (victoryVideo) {
+                victoryVideo.style.display = 'none';
+                victoryVideo.pause();
+            }
 
             grid = [];
             for (var r = 0; r < size; r++) {
@@ -729,6 +752,16 @@
             overlayTitle.className = 'overlay-title' + (isWin ? ' win' : '');
             overlaySubtitle.textContent = subtitle;
             overlay.classList.add('active');
+
+            // 胜利时播放视频（显示在按钮下方）
+            if (isWin && victoryVideo) {
+                victoryVideo.style.display = 'block';
+                victoryVideo.currentTime = 0;
+                victoryVideo.play().catch(function() {});
+            } else if (victoryVideo) {
+                victoryVideo.style.display = 'none';
+                victoryVideo.pause();
+            }
         }
 
         function updateScoreDisplay() {
