@@ -379,12 +379,13 @@
             overlaySubtitle = document.getElementById('overlay-subtitle');
             victoryVideo = document.getElementById('victory-video');
 
-            // 设置视频路径（本地用绝对路径，线上用相对路径）
+            // 设置视频路径并预加载（本地用绝对路径，线上用相对路径）
             if (window.location.protocol === 'file:') {
                 victoryVideo.src = 'file:///C:/Users/zhangfan/my-openspec-project/小游戏/2048-assets/victory.mp4';
             } else {
                 victoryVideo.src = '小游戏/2048-assets/victory.mp4';
             }
+            victoryVideo.load(); // 预加载视频
 
             best = parseInt(localStorage.getItem(BEST_KEY) || '0');
             bestEl.textContent = best;
@@ -757,7 +758,15 @@
             if (isWin && victoryVideo) {
                 victoryVideo.style.display = 'block';
                 victoryVideo.currentTime = 0;
-                victoryVideo.play().catch(function() {});
+                // 等待视频加载完成后播放
+                if (victoryVideo.readyState >= 3) {
+                    victoryVideo.play().catch(function() {});
+                } else {
+                    victoryVideo.oncanplay = function() {
+                        victoryVideo.play().catch(function() {});
+                        victoryVideo.oncanplay = null;
+                    };
+                }
             } else if (victoryVideo) {
                 victoryVideo.style.display = 'none';
                 victoryVideo.pause();
