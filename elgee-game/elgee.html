@@ -262,24 +262,25 @@
             .menu-title { font-size: 28px; }
         }
 
-        /* 手机适配：缩放整个游戏区域 */
+        /* 手机适配：基于 1334x750 设计稿缩放 */
         @media (max-width: 750px) {
             .map-area {
                 align-items: flex-start;
                 padding-top: 5px;
             }
             .map-container {
-                width: 100vw !important;
-                min-width: 100vw;
+                width: calc(1334px * (100vw / 1334)) !important;
+                min-width: calc(1334px * (100vw / 1334));
+                max-width: 100vw;
                 transform-origin: top center;
             }
             .tile {
-                width: calc(100vw / 8.64) !important;
-                height: calc(100vw / 7.78) !important;
+                width: calc(81px * (100vw / 1334)) !important;
+                height: calc(90px * (100vw / 1334)) !important;
             }
             .tile img {
-                width: calc(100vw / 8.64) !important;
-                height: calc(100vw / 7.78) !important;
+                width: calc(81px * (100vw / 1334)) !important;
+                height: calc(90px * (100vw / 1334)) !important;
             }
             .collect-grid {
                 gap: 4px;
@@ -292,7 +293,7 @@
         /* 小屏手机额外适配 */
         @media (max-width: 380px) {
             .map-container {
-                transform: scale(0.85);
+                transform: scale(0.9);
             }
             .collect-grid {
                 gap: 3px;
