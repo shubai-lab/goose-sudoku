@@ -1,2 +1,0 @@
-node atlasImg.js
-pause
