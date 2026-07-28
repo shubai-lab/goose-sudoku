@@ -1,0 +1,1 @@
+start chrome.exe --disable-web-security --user-data-dir=%cd%\.laya\chrome %cd%.\bin\index.html

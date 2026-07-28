@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="c82rkanq">
+  <resources>
+    <image id="dcoy0" name="杀了个杀2.jpg" path="/"/>
+    <image id="93o51" name="杀了个杀1.jpg" path="/"/>
+    <image id="93o52" name="杀了个杀2(1).jpg" path="/"/>
+    <image id="93o53" name="杀了个杀3.jpg" path="/"/>
+    <image id="93o54" name="杀了个杀4.jpg" path="/"/>
+    <image id="93o55" name="杀了个杀5.jpg" path="/"/>
+    <image id="93o56" name="杀了个杀6.jpg" path="/"/>
+    <image id="93o57" name="杀了个杀7.jpg" path="/"/>
+    <image id="93o58" name="杀了个杀8.jpg" path="/"/>
+    <image id="93o59" name="杀了个杀9.jpg" path="/"/>
+    <image id="93o5a" name="photo_2022-09-19_15-36-57.jpg" path="/"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>

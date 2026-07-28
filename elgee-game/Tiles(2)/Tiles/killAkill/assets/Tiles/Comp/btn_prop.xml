@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="101,100" pivot="0.5,0.5" extention="Button">
+  <displayList>
+    <image id="n0_93o5" name="n0" src="dcoy2" fileName="Res/道具.png" xy="0,0"/>
+    <text id="n1_93o5" name="title" xy="69,-1" size="58,44" font="ui://cy0uhdqx93o5c" fontSize="12" letterSpacing="-2" text="x3"/>
+  </displayList>
+  <Button downEffect="scale" downEffectValue=".95"/>
+</component>

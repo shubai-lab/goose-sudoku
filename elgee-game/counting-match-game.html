@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数物对应游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #5a4fcf;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .level-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .level-btn.easy {
+            background: #4ade80;
+            color: #065f46;
+        }
+
+        .level-btn.medium {
+            background: #fbbf24;
+            color: #92400e;
+        }
+
+        .level-btn.hard {
+            background: #f87171;
+            color: #7f1d1d;
+        }
+
+        .level-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .question {
+            text-align: center;
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .items-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            min-height: 80px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 15px;
+        }
+
+        .item {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            line-height: 1;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .options-label {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            width: 70px;
+            height: 70px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            background: #f9f9f9;
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            transform: scale(1.1);
+            border-color: #a8edea;
+            background: #f0fdf9;
+        }
+
+        .option-btn.correct {
+            background: #4ade80;
+            border-color: #22c55e;
+            color: white;
+            animation: bounce 0.5s;
+        }
+
+        .option-btn.wrong {
+            background: #f87171;
+            border-color: #ef4444;
+            color: white;
+            animation: shake 0.5s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .score {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .score span {
+            color: #5a4fcf;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            min-height: 30px;
+        }
+
+        .message.success {
+            color: #22c55e;
+        }
+
+        .message.error {
+            color: #ef4444;
+        }
+
+        .next-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 12px 40px;
+            background: #5a4fcf;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .next-btn:hover {
+            background: #4a3fcf;
+            transform: scale(1.05);
+        }
+
+        .next-btn.hidden {
+            display: none;
+        }
+
+        /* 模式切换 */
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            padding: 8px 20px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #5a4fcf;
+            color: white;
+            border-color: #5a4fcf;
+        }
+
+        .debug-info {
+            margin-top: 20px;
+            padding: 10px;
+            background: #eee;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>数物对应游戏</h1>
+    <p class="subtitle">数一数有多少个物品，选出正确的数字</p>
+
+    <div class="game-container">
+        <div class="mode-switch">
+            <button class="mode-btn active" id="emojiModeBtn"> Emoji模式 </button>
+            <button class="mode-btn" id="numberModeBtn"> 数字模式 </button>
+        </div>
+
+        <div class="level-selector">
+            <button class="level-btn easy active" id="level1Btn">简单 (1-3)</button>
+            <button class="level-btn medium" id="level2Btn">中等 (1-5)</button>
+            <button class="level-btn hard" id="level3Btn">困难 (1-10)</button>
+        </div>
+
+        <div class="question" id="question">数一数有多少个 🍎？</div>
+
+        <div class="items-container" id="itemsContainer">
+            <span style="color:#999;">加载中...</span>
+        </div>
+
+        <div class="options-label">请点击正确答案：</div>
+        <div class="options" id="optionsContainer">
+            <span style="color:#999;">加载中...</span>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="score">得分: <span id="score">0</span> 分</div>
+
+        <button class="next-btn hidden" id="nextBtn">下一题 ➡</button>
+    </div>
+
+    <div class="debug-info" id="debugInfo"></div>
+
+    <script>
+        // Emoji素材库
+        const EMOJIS = ['🍎', '🍊', '🍇', '🍓', '🍒', '🍑', '🥕', '🌸', '🌺', '🍄', '🧸', '🐶', '🐱', '🐰', '🦋', '🐝', '🐞'];
+
+        // 难度配置
+        const LEVELS = {
+            1: { min: 1, max: 3, options: 3 },
+            2: { min: 1, max: 5, options: 4 },
+            3: { min: 1, max: 10, options: 4 }
+        };
+
+        let currentLevel = 1;
+        let currentMode = 'emoji';
+        let currentAnswer = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // 绑定按钮事件
+        document.getElementById('emojiModeBtn').onclick = function() { setMode('emoji'); };
+        document.getElementById('numberModeBtn').onclick = function() { setMode('number'); };
+        document.getElementById('level1Btn').onclick = function() { setLevel(1); };
+        document.getElementById('level2Btn').onclick = function() { setLevel(2); };
+        document.getElementById('level3Btn').onclick = function() { setLevel(3); };
+        document.getElementById('nextBtn').onclick = nextQuestion;
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            if (mode === 'emoji') {
+                document.getElementById('emojiModeBtn').classList.add('active');
+            } else {
+                document.getElementById('numberModeBtn').classList.add('active');
+            }
+            nextQuestion();
+        }
+
+        function setLevel(level) {
+            currentLevel = level;
+            document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+            if (level === 1) document.getElementById('level1Btn').classList.add('active');
+            if (level === 2) document.getElementById('level2Btn').classList.add('active');
+            if (level === 3) document.getElementById('level3Btn').classList.add('active');
+            score = 0;
+            document.getElementById('score').textContent = '0';
+            nextQuestion();
+        }
+
+        function getRandomEmoji() {
+            return EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        }
+
+        function generateQuestion() {
+            const config = LEVELS[currentLevel];
+            currentAnswer = Math.floor(Math.random() * (config.max - config.min + 1)) + config.min;
+            const emoji = getRandomEmoji();
+
+            // 显示问题
+            const questionEl = document.getElementById('question');
+            if (currentMode === 'emoji') {
+                questionEl.textContent = '数一数有多少个 ' + emoji + '？';
+            } else {
+                questionEl.textContent = '数一数下面有多少颗星星？';
+            }
+
+            // 生成物品
+            const itemsContainer = document.getElementById('itemsContainer');
+            itemsContainer.innerHTML = '';
+
+            const displayEmoji = currentMode === 'emoji' ? emoji : '⭐';
+            const itemColor = currentMode === 'emoji' ? 'inherit' : '#fbbf24';
+
+            for (let i = 0; i < currentAnswer; i++) {
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.textContent = displayEmoji;
+                if (currentMode === 'number') {
+                    item.style.textShadow = '2px 2px 4px rgba(251, 191, 36, 0.5)';
+                    item.style.fontSize = '32px';
+                }
+                item.style.animationDelay = (i * 0.08) + 's';
+                itemsContainer.appendChild(item);
+            }
+
+            // 生成选项
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            // 生成正确答案和干扰项
+            let optionNumbers = [currentAnswer];
+            while (optionNumbers.length < config.options) {
+                let num = Math.floor(Math.random() * config.max) + 1;
+                if (!optionNumbers.includes(num)) {
+                    optionNumbers.push(num);
+                }
+            }
+            // 随机打乱顺序
+            optionNumbers.sort(function() { return Math.random() - 0.5; });
+
+            optionNumbers.forEach(function(num) {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = num;
+                btn.onclick = function() { checkAnswer(num, btn); };
+                optionsContainer.appendChild(btn);
+            });
+
+            // 调试信息
+            document.getElementById('debugInfo').textContent =
+                '答案: ' + currentAnswer + ' | 难度: ' + currentLevel + ' | 模式: ' + currentMode;
+        }
+
+        function checkAnswer(selectedNum, btn) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const messageEl = document.getElementById('message');
+            const nextBtn = document.getElementById('nextBtn');
+
+            if (selectedNum === currentAnswer) {
+                btn.classList.add('correct');
+                messageEl.textContent = '🎉 太棒了！答对了！';
+                messageEl.className = 'message success';
+                score += 10;
+                document.getElementById('score').textContent = score;
+            } else {
+                btn.classList.add('wrong');
+                messageEl.textContent = '😅 正确答案是 ' + currentAnswer + ' 哦！';
+                messageEl.className = 'message error';
+                // 显示正确答案
+                document.querySelectorAll('.option-btn').forEach(function(b) {
+                    if (parseInt(b.textContent) === currentAnswer) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            nextBtn.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            isAnswered = false;
+            document.getElementById('message').textContent = '';
+            document.getElementById('nextBtn').classList.add('hidden');
+            generateQuestion();
+        }
+
+        // 初始化 - 立即执行
+        window.onload = function() {
+            generateQuestion();
+        };
+
+        // 也尝试 DOMContentLoaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', generateQuestion);
+        } else {
+            generateQuestion();
+        }
+    </script>
+</body>
+</html>

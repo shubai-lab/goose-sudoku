@@ -1,0 +1,76 @@
+{
+    "frames": {
+        "logoIcon.jpg": {
+            "frame": {
+                "h": 100,
+                "idx": 0,
+                "w": 100,
+                "x": 751,
+                "y": 146
+            },
+            "sourceSize": {
+                "h": 100,
+                "w": 100
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "shaderBg.png": {
+            "frame": {
+                "h": 1300,
+                "idx": 0,
+                "w": 750,
+                "x": 0,
+                "y": 0
+            },
+            "sourceSize": {
+                "h": 1300,
+                "w": 750
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "shaderClose.png": {
+            "frame": {
+                "h": 46,
+                "idx": 0,
+                "w": 89,
+                "x": 852,
+                "y": 146
+            },
+            "sourceSize": {
+                "h": 46,
+                "w": 89
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "shaderText.png": {
+            "frame": {
+                "h": 145,
+                "idx": 0,
+                "w": 533,
+                "x": 751,
+                "y": 0
+            },
+            "sourceSize": {
+                "h": 145,
+                "w": 533
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        }
+    },
+    "meta": {
+        "image": "shader.png",
+        "prefix": "shader/"
+    }
+}

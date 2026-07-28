@@ -1,0 +1,4 @@
+atlasImg：此工具用于图集打包
+使用步骤：
+1. 打开atlasImg.bat
+2. 将散图所在的文件夹（与layaide路径一样）拖入命令窗口中，再按“Enter”即可。

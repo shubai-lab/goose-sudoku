@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1300" designImage="ui://c82rkanq93o51">
+  <displayList>
+    <image id="n0_93o5" name="bg" src="dcoy1" fileName="Res/bg.png" pkg="cy0uhdqx" xy="0,0">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <component id="n1_93o5" name="btn_start" src="dcoyh" fileName="Comp/templete_btn.xml" xy="375,1043" size="356,87">
+      <relation target="" sidePair="center-center,middle-middle"/>
+      <Button icon="ui://41zbxs4q93o5l"/>
+    </component>
+    <component id="n2_93o5" name="btn_set" src="dcoyh" fileName="Comp/templete_btn.xml" xy="688,207" size="94,93">
+      <relation target="" sidePair="center-center,middle-middle"/>
+      <Button icon="ui://41zbxs4qdcoy8"/>
+    </component>
+    <component id="n3_93o5" name="btn_user" src="dcoyh" fileName="Comp/templete_btn.xml" xy="72,203" size="94,93">
+      <relation target="" sidePair="center-center,middle-middle"/>
+      <Button icon="ui://41zbxs4q93o5m"/>
+    </component>
+    <image id="n4_93o5" name="n4" src="93o5n" fileName="Res/Main/组 20.png" xy="146,259">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </image>
+  </displayList>
+</component>

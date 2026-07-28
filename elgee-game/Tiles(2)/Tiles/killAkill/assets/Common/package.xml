@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="cy0uhdqx">
+  <resources>
+    <component id="dcoy0" name="mask.xml" path="/" exported="true"/>
+    <image id="dcoy1" name="bg.png" path="/Res/" exported="true" scale="9grid" scale9grid="187,488,374,324"/>
+    <image id="93o51" name="0.png" path="/Font/"/>
+    <image id="93o52" name="1.png" path="/Font/"/>
+    <image id="93o53" name="2.png" path="/Font/"/>
+    <image id="93o54" name="3.png" path="/Font/"/>
+    <image id="93o55" name="4.png" path="/Font/"/>
+    <image id="93o56" name="5.png" path="/Font/"/>
+    <image id="93o57" name="6.png" path="/Font/"/>
+    <image id="93o58" name="7.png" path="/Font/"/>
+    <image id="93o59" name="8.png" path="/Font/"/>
+    <image id="93o5a" name="9.png" path="/Font/"/>
+    <image id="93o5b" name="x.png" path="/Font/"/>
+    <font id="93o5c" name="PropFont.fnt" path="/Font/" exported="true"/>
+    <image id="93o5d" name="c.png" path="/Font2/"/>
+    <image id="93o5e" name="0.png" path="/Font2/"/>
+    <image id="93o5f" name="1.png" path="/Font2/"/>
+    <image id="93o5g" name="2.png" path="/Font2/"/>
+    <image id="93o5h" name="3.png" path="/Font2/"/>
+    <image id="93o5i" name="4.png" path="/Font2/"/>
+    <image id="93o5j" name="5.png" path="/Font2/"/>
+    <image id="93o5k" name="6.png" path="/Font2/"/>
+    <image id="93o5l" name="7.png" path="/Font2/"/>
+    <image id="93o5m" name="8.png" path="/Font2/"/>
+    <image id="93o5n" name="9.png" path="/Font2/"/>
+    <font id="93o5o" name="Font2.fnt" path="/Font2/" exported="true"/>
+    <image id="93o5p" name="秒.png" path="/Font2/"/>
+    <image id="93o5q" name="时.png" path="/Font2/"/>
+    <image id="93o5r" name="分.png" path="/Font2/"/>
+    <component id="93o5s" name="Loading.xml" path="/" exported="true"/>
+    <component id="93o5t" name="Fail.xml" path="/" exported="true"/>
+    <component id="93o5u" name="empty.xml" path="/"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>
