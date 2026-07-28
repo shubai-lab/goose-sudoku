@@ -261,6 +261,44 @@
             .tile img { width: 54px; height: 61px; }
             .menu-title { font-size: 28px; }
         }
+
+        /* 手机适配：缩放整个游戏区域 */
+        @media (max-width: 750px) {
+            .map-area {
+                align-items: flex-start;
+                padding-top: 5px;
+            }
+            .map-container {
+                width: 100vw !important;
+                min-width: 100vw;
+                transform-origin: top center;
+            }
+            .tile {
+                width: calc(100vw / 8.64) !important;
+                height: calc(100vw / 7.78) !important;
+            }
+            .tile img {
+                width: calc(100vw / 8.64) !important;
+                height: calc(100vw / 7.78) !important;
+            }
+            .collect-grid {
+                gap: 4px;
+            }
+            .collect-slot {
+                min-width: 0;
+            }
+        }
+
+        /* 小屏手机额外适配 */
+        @media (max-width: 380px) {
+            .map-container {
+                transform: scale(0.85);
+            }
+            .collect-grid {
+                gap: 3px;
+                padding: 8px;
+            }
+        }
     </style>
 </head>
 <body>
