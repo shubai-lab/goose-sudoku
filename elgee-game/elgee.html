@@ -1765,19 +1765,65 @@
             }
         });
         setTimeout(function() {
+            // 收集要放回场地的卡牌
+            var cardsToReturn = [];
             indexes.forEach(function(idx) {
                 var item = state.collect[idx];
+                // 找到收集区中对应类型的卡牌
                 for (var li = 0; li < state.cards.length; li++) {
                     var layer = state.cards[li];
                     if (!layer) continue;
                     for (var gi = 0; gi < layer.length; gi++) {
                         var card = layer[gi];
-                        if (card.type === item.type && card.area === AREA.COLLECTION) { moveToInvalid(card); break; }
+                        if (card.type === item.type && card.area === AREA.COLLECTION) {
+                            cardsToReturn.push(card);
+                            break;
+                        }
                     }
                 }
             });
+
+            // 找到场地中的空位（即 card === null 的位置）
+            var emptyPositions = [];
+            for (var li = 0; li < state.cards.length; li++) {
+                var layer = state.cards[li];
+                if (!layer) continue;
+                for (var gi = 0; gi < layer.length; gi++) {
+                    var card = layer[gi];
+                    if (card === null) {
+                        emptyPositions.push({ layerIndex: li, gridIndex: gi });
+                    }
+                }
+            }
+
+            // 打乱空位顺序
+            for (var i = emptyPositions.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = emptyPositions[i];
+                emptyPositions[i] = emptyPositions[j];
+                emptyPositions[j] = temp;
+            }
+
+            // 把卡牌放回空位
+            cardsToReturn.forEach(function(card, i) {
+                if (i < emptyPositions.length) {
+                    var pos = emptyPositions[i];
+                    card.area = AREA.OPERATION;
+                    card.layerIndex = pos.layerIndex;
+                    card.gridIndex = pos.gridIndex;
+                    // 更新位置
+                    var layout = LAYOUT_CONFIG[state.level + '_' + state.difficulty];
+                    if (layout && layout.layout[pos.gridIndex]) {
+                        card.x = layout.layout[pos.gridIndex].X;
+                        card.y = layout.layout[pos.gridIndex].Y;
+                    }
+                }
+            });
+
+            // 从收集区移除
             indexes.reverse().forEach(function(idx) { state.collect.splice(idx, 1); });
             renderGame();
+            updateCardStatus();
             checkWin();
             checkAvailableMoves();
             $.hintBar.classList.add('hidden');
