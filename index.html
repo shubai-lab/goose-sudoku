@@ -619,10 +619,12 @@
 
     .help-rule {
       display: flex;
-      gap: var(--space-md);
-      padding: var(--space-md);
+      align-items: center;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
       background: rgba(255, 255, 255, 0.1);
       border-radius: 14px;
+      flex-wrap: wrap;
     }
 
     .help-rule .icon {
@@ -665,6 +667,114 @@
 
     .help-close-btn:hover {
       background: #e5b31a;
+    }
+
+    /* 帮助页面规则示意样式 */
+    .help-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.15);
+      margin: var(--space-xs) 0;
+    }
+
+    .rule-visual {
+      flex-shrink: 0;
+    }
+
+    .rule-board-3x3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      width: 90px;
+      padding: 6px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+    }
+
+    .rule-cell {
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rule-cell.color-a { background: #8B5CF6; }
+    .rule-cell.color-b { background: #10B981; }
+    .rule-cell.color-c { background: #F59E0B; }
+    .rule-cell.color-d { background: #EF4444; }
+
+    .rule-cell.mark::after {
+      content: '✕';
+      color: rgba(0, 0, 0, 0.3);
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .rule-goose {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+
+    .rule-separator {
+      font-size: 1.5rem;
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: bold;
+    }
+
+    .rule-text {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .rule-text h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .rule-text p {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.5;
+    }
+
+    .rule-column-board {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(16, 185, 129, 0.3));
+    }
+
+    .rule-touch-demo {
+      padding: 6px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+    }
+
+    .rule-touch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+    }
+
+    .rule-cell.touch-center {
+      background: var(--accent);
+      position: relative;
+    }
+
+    .rule-cell.touch-center-txt {
+      background: rgba(246, 193, 29, 0.3);
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rule-cell.touch-blocked {
+      background: rgba(239, 68, 68, 0.3);
+      border: 1px dashed rgba(239, 68, 68, 0.5);
     }
 
     /* ===== 弹窗 ===== */
@@ -927,36 +1037,85 @@
 
       <div class="help-rules">
         <div class="help-rule">
-          <span class="icon">🎨</span>
-          <div>
+          <div class="rule-visual">
+            <div class="rule-board-3x3">
+              <div class="rule-cell color-a"><img src="goose-sudoku/goose.png" class="rule-goose" alt=""></div>
+              <div class="rule-cell color-a"></div>
+              <div class="rule-cell color-b"></div>
+              <div class="rule-cell color-a"></div>
+              <div class="rule-cell color-b"><img src="goose-sudoku/goose.png" class="rule-goose" alt=""></div>
+              <div class="rule-cell color-b"></div>
+              <div class="rule-cell color-c"></div>
+              <div class="rule-cell color-c"></div>
+              <div class="rule-cell color-c"></div>
+            </div>
+          </div>
+          <div class="rule-separator">=</div>
+          <div class="rule-text">
             <h3>每种颜色一只鹅</h3>
             <p>每种颜色领地中只能放一只大鹅</p>
           </div>
         </div>
 
+        <div class="help-divider"></div>
+
         <div class="help-rule">
-          <span class="icon">📏</span>
-          <div>
+          <div class="rule-visual">
+            <div class="rule-board-3x3 rule-column-board">
+              <div class="rule-cell"><img src="goose-sudoku/goose.png" class="rule-goose" alt=""></div>
+              <div class="rule-cell mark"></div>
+              <div class="rule-cell mark"></div>
+              <div class="rule-cell mark"></div>
+              <div class="rule-cell"><img src="goose-sudoku/goose.png" class="rule-goose" alt=""></div>
+              <div class="rule-cell mark"></div>
+              <div class="rule-cell mark"></div>
+              <div class="rule-cell"><img src="goose-sudoku/goose.png" class="rule-goose" alt=""></div>
+              <div class="rule-cell mark"></div>
+            </div>
+          </div>
+          <div class="rule-separator">=</div>
+          <div class="rule-text">
             <h3>同行同列各一只</h3>
             <p>每一行和每一列都只能放一只大鹅</p>
           </div>
         </div>
 
+        <div class="help-divider"></div>
+
         <div class="help-rule">
-          <span class="icon">🚫</span>
-          <div>
-            <h3>不能相邻</h3>
+          <div class="rule-visual">
+            <div class="rule-touch-demo">
+              <div class="rule-touch-grid">
+                <div class="rule-cell touch-center"><img src="goose-sudoku/goose.png" class="rule-goose" alt=""></div>
+                <div class="rule-cell touch-blocked"></div>
+                <div class="rule-cell touch-blocked"></div>
+                <div class="rule-cell touch-blocked"></div>
+                <div class="rule-cell touch-center-txt">鹅</div>
+                <div class="rule-cell touch-blocked"></div>
+                <div class="rule-cell touch-blocked"></div>
+                <div class="rule-cell touch-blocked"></div>
+                <div class="rule-cell touch-blocked"></div>
+              </div>
+            </div>
+          </div>
+          <div class="rule-separator">=</div>
+          <div class="rule-text">
+            <h3>鹅不能接触</h3>
             <p>任意两只大鹅都不能放在横向、纵向或斜向相邻的格子里</p>
           </div>
         </div>
+
+        <div class="help-divider"></div>
 
         <div class="help-rule">
           <span class="icon">👆</span>
           <div>
             <h3>操作方式</h3>
-            <p>单击标记叉号，双击放置大鹅</p>
+            <p>单击标记叉号，长按放置大鹅</p>
           </div>
         </div>
+
+        <div class="help-divider"></div>
 
         <div class="help-rule">
           <span class="icon"><img src="goose-sudoku/Hock.png" class="fish-img" alt=""></span>
