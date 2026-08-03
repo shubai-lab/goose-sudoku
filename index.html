@@ -1098,7 +1098,7 @@
   <div class="game-container" id="app">
     <!-- 菜单页面 -->
     <div class="menu-page" id="menu-page">
-      <div class="menu-logo"><img src="goose-sudoku/goose.png" alt="大鹅"></div>
+      <div class="menu-logo"><img src="goose.png" alt="大鹅"></div>
       <h1 class="menu-title">大鹅数独</h1>
       <p class="menu-subtitle">给聪明阿九的治愈系数独游戏</p>
 
@@ -1148,7 +1148,7 @@
       <div class="help-rules">
         <div class="help-rule">
           <div class="rule-visual">
-            <img src="goose-sudoku/rule1.png" class="rule-img" alt="规则1">
+            <img src="rule1.png" class="rule-img" alt="规则1">
           </div>
           <div class="rule-separator">=</div>
           <div class="rule-text">
@@ -1161,7 +1161,7 @@
 
         <div class="help-rule">
           <div class="rule-visual">
-            <img src="goose-sudoku/rule2.png" class="rule-img" alt="规则2">
+            <img src="rule2.png" class="rule-img" alt="规则2">
           </div>
           <div class="rule-separator">=</div>
           <div class="rule-text">
@@ -1174,7 +1174,7 @@
 
         <div class="help-rule">
           <div class="rule-visual">
-            <img src="goose-sudoku/rule3.png" class="rule-img" alt="规则3">
+            <img src="rule3.png" class="rule-img" alt="规则3">
           </div>
           <div class="rule-separator">=</div>
           <div class="rule-text">
@@ -1203,7 +1203,7 @@
         <div class="game-header-left">
           <button class="back-btn" onclick="exitGame()">←</button>
           <div>
-            <div class="header-title"><img src="goose-sudoku/goose.png" class="header-goose" alt=""> <span id="level-title">第 1 关</span></div>
+            <div class="header-title"><img src="goose.png" class="header-goose" alt=""> <span id="level-title">第 1 关</span></div>
             <div class="header-subtitle" id="level-size">5 × 5</div>
           </div>
         </div>
@@ -1214,15 +1214,15 @@
 
       <div class="rules-bar">
         <div class="rule-item">
-          <img src="goose-sudoku/rule1.png" class="rule-icon-img" alt="规则1">
+          <img src="rule1.png" class="rule-icon-img" alt="规则1">
           <span class="rule-text">每种颜色一只鹅</span>
         </div>
         <div class="rule-item">
-          <img src="goose-sudoku/rule2.png" class="rule-icon-img" alt="规则2">
+          <img src="rule2.png" class="rule-icon-img" alt="规则2">
           <span class="rule-text">同行同列各一只</span>
         </div>
         <div class="rule-item">
-          <img src="goose-sudoku/rule3.png" class="rule-icon-img" alt="规则3">
+          <img src="rule3.png" class="rule-icon-img" alt="规则3">
           <span class="rule-text">鹅不能接触</span>
         </div>
       </div>
@@ -1230,7 +1230,7 @@
       <div class="status-bar">
         <div class="status-label">通关规则</div>
         <div class="status-pill goose-progress">
-          <span class="icon"><img src="goose-sudoku/goose.png" class="status-goose" alt=""></span>
+          <span class="icon"><img src="goose.png" class="status-goose" alt=""></span>
           <span class="count" id="goose-count">0</span>
           <span class="total">/<span id="board-size">5</span></span>
         </div>
@@ -1273,7 +1273,7 @@
     <!-- 完成弹窗 -->
     <div class="modal-overlay hidden" id="complete-modal">
       <div class="modal">
-        <div class="modal-icon"><img src="goose-sudoku/goose.png" alt="大鹅"></div>
+        <div class="modal-icon"><img src="goose.png" alt="大鹅"></div>
         <h2 class="modal-title win" id="complete-title">完美通关！</h2>
         <p class="modal-text" id="complete-body">每只大鹅都找到了互不打扰的舒适领地</p>
         <p class="modal-time">用时: <span id="complete-time">0:00</span></p>
@@ -1304,7 +1304,7 @@
 
         <div class="tutorial-rule">
           <div class="rule-visual">
-            <img src="goose-sudoku/rule1.png" class="rule-img" alt="规则1">
+            <img src="rule1.png" class="rule-img" alt="规则1">
           </div>
           <div class="rule-text">
             <h3>每种颜色一只鹅</h3>
@@ -1314,7 +1314,7 @@
 
         <div class="tutorial-rule">
           <div class="rule-visual">
-            <img src="goose-sudoku/rule2.png" class="rule-img" alt="规则2">
+            <img src="rule2.png" class="rule-img" alt="规则2">
           </div>
           <div class="rule-text">
             <h3>同行同列各一只</h3>
@@ -1324,7 +1324,7 @@
 
         <div class="tutorial-rule">
           <div class="rule-visual">
-            <img src="goose-sudoku/rule3.png" class="rule-img" alt="规则3">
+            <img src="rule3.png" class="rule-img" alt="规则3">
           </div>
           <div class="rule-text">
             <h3>鹅不能接触</h3>
@@ -1582,7 +1582,7 @@
             onmouseup="handleMouseUp(${row}, ${col})"
             ontouchstart="handleTouchStart(event, ${row}, ${col})"
             ontouchend="handleTouchEnd(event, ${row}, ${col})"
-          >${state === 'goose' ? '<img src="goose-sudoku/goose.png" class="goose-img" alt="">' : ''}</button>`;
+          >${state === 'goose' ? '<img src="goose.png" class="goose-img" alt="">' : ''}</button>`;
         }
       }
 
