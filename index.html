@@ -1850,9 +1850,30 @@
     function showHint() {
       if (hintsRemaining <= 0 || isComplete) return;
 
-      for (let row = 0; row < currentLevel.size; row++) {
+      const size = currentLevel.size;
+      const regions = currentLevel.regions;
+
+      // 找出每行每列每个区域已放的大鹅
+      const colHasGoose = Array(size).fill(false);
+      const regionHasGoose = {};
+
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          if (cells[row][col] === 'goose') {
+            colHasGoose[col] = true;
+            const region = regions[row][col];
+            regionHasGoose[region] = true;
+          }
+        }
+      }
+
+      // 找到下一个可放置的位置
+      for (let row = 0; row < size; row++) {
         const col = currentLevel.solution[row];
-        if (cells[row][col] !== 'goose') {
+        const region = regions[row][col];
+
+        // 检查这行是否已有大鹅、这列是否已有大鹅、这区域是否已有大鹅
+        if (cells[row][col] !== 'goose' && !colHasGoose[col] && !regionHasGoose[region]) {
           hintsRemaining--;
 
           const cellEl = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
